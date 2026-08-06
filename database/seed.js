@@ -7,6 +7,15 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
+// 讀取 .env.local
+const envPath = path.join(__dirname, '..', '.env.local');
+if (fs.existsSync(envPath)) {
+  fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
+    const [key, ...val] = line.split('=');
+    if (key && val.length) process.env[key.trim()] = val.join('=').trim();
+  });
+}
+
 const DB_PATH = path.join(__dirname, 'gdnb.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
@@ -34,9 +43,15 @@ for (const sql of migrations) {
 }
 
 // ── Admin 帳號 ───────────────────────────────────────────
-// ⚠️  上線前請把帳號和密碼改掉！
-const ADMIN_USERNAME = 'admin';   // ← 改這裡
-const ADMIN_PASSWORD = 'password123';  // ← 改這裡
+// 從 .env.local 讀取，格式：
+//   ADMIN_USERNAME=你的帳號
+//   ADMIN_PASSWORD=你的密碼
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD) {
+  console.error('❌ 請在 .env.local 設定 ADMIN_PASSWORD');
+  process.exit(1);
+}
 
 const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
 const hash = bcrypt.hashSync(ADMIN_PASSWORD, 10);
