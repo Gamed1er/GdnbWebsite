@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Play, Eye, Globe } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n';
@@ -12,10 +12,10 @@ interface YoutubeVideo {
   thumbnail_url: string;
   published_at: string;
   duration: string;
+  video_type: 'video' | 'short' | 'live';
   view_count: number;
 }
 
-// ISO 8601 duration 轉可讀格式，e.g. PT10M30S → 10:30
 function parseDuration(iso: string): string {
   const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!match) return '';
@@ -26,12 +26,27 @@ function parseDuration(iso: string): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+const TYPE_LABELS = {
+  all:   { zh: '全部',   en: 'All' },
+  video: { zh: '影片',   en: 'Videos' },
+  short: { zh: 'Shorts', en: 'Shorts' },
+  live:  { zh: '直播',   en: 'Live' },
+};
+
+const TYPE_BADGE: Record<string, { label: string; color: string }> = {
+  short: { label: 'Short', color: '#ff0066' },
+  live:  { label: '直播',  color: '#9333ea' },
+};
+
+type FilterType = 'all' | 'video' | 'short' | 'live';
+
 export default function VideosPage() {
   const { lang } = useLang();
   const t = ui[lang].videos;
   const c = ui[lang].common;
   const [videos, setVideos] = useState<YoutubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<FilterType>('all');
 
   useEffect(() => {
     fetch('/api/videos')
@@ -39,49 +54,53 @@ export default function VideosPage() {
       .then((data) => { setVideos(data); setLoading(false); });
   }, []);
 
+  const filtered = useMemo(() =>
+    filter === 'all' ? videos : videos.filter(v => v.video_type === filter),
+    [videos, filter]
+  );
+
+  const filters: FilterType[] = ['all', 'video', 'short', 'live'];
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{t.title}</h1>
           <p style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             {t.subtitle}
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: '4px',
-              padding: '2px 8px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: '999px',
-              fontSize: '0.75rem',
-              color: 'var(--text-muted)',
-            }}>
-              <Globe size={11} />
-              {t.langBadge}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '999px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <Globe size={11} />{t.langBadge}
             </span>
           </p>
         </div>
-        <a
-          href="https://www.youtube.com/@gdnb_v2.0"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '8px 18px',
-            background: '#ef4444',
-            color: 'white',
-            borderRadius: '8px',
-            textDecoration: 'none',
-            fontWeight: 600,
-            fontSize: '0.9rem',
-          }}
-        >
+        <a href="https://www.youtube.com/@gdnb_v2.0" target="_blank" rel="noopener noreferrer"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 18px', background: '#ef4444', color: 'white', borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>
           ▶ {t.subscribeBtn}
         </a>
       </div>
 
+      {/* 分類篩選 */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        {filters.map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            style={{
+              padding: '5px 16px', borderRadius: '999px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', border: '1px solid',
+              borderColor: filter === f ? 'var(--accent-blue)' : 'var(--border)',
+              background: filter === f ? 'rgba(59,130,246,0.15)' : 'transparent',
+              color: filter === f ? 'var(--accent-blue-light)' : 'var(--text-muted)',
+              transition: 'all 0.15s',
+            }}
+          >
+            {TYPE_LABELS[f][lang === 'zh' ? 'zh' : 'en']}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>{c.loading}</div>
-      ) : videos.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
           <Play size={40} style={{ marginBottom: '1rem', opacity: 0.3 }} />
           <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{t.empty}</p>
@@ -89,51 +108,38 @@ export default function VideosPage() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
-          {videos.map((video) => (
-            <a
-              key={video.id}
-              href={`https://www.youtube.com/watch?v=${video.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: 'none' }}
-            >
+          {filtered.map((video) => (
+            <a key={video.id} href={`https://www.youtube.com/watch?v=${video.id}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
               <div className="card" style={{ overflow: 'hidden' }}>
-                {/* 縮圖 */}
                 <div style={{ position: 'relative', aspectRatio: '16/9', background: '#0a0f1a' }}>
                   {video.thumbnail_url && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={video.thumbnail_url}
-                      alt={video.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
+                    <img src={video.thumbnail_url} alt={video.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   )}
-                  {/* 播放 overlay */}
-                  <div style={{
-                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0)', transition: 'background 0.2s',
-                  }}
-                    className="video-overlay"
-                  >
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0)', transition: 'background 0.2s' }} className="video-overlay">
                     <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }} className="play-btn">
                       <Play size={20} fill="#000" color="#000" style={{ marginLeft: '3px' }} />
                     </div>
                   </div>
+                  {/* 類型標籤 */}
+                  {TYPE_BADGE[video.video_type] && (
+                    <span style={{ position: 'absolute', top: '8px', left: '8px', background: TYPE_BADGE[video.video_type].color, color: 'white', fontSize: '0.7rem', fontWeight: 700, padding: '2px 7px', borderRadius: '4px', letterSpacing: '0.03em' }}>
+                      {TYPE_BADGE[video.video_type].label}
+                    </span>
+                  )}
                   {/* 時長 */}
-                  {video.duration && (
+                  {video.duration && video.video_type !== 'live' && (
                     <span style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.8)', color: 'white', fontSize: '0.75rem', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' }}>
                       {parseDuration(video.duration)}
                     </span>
                   )}
                 </div>
-
-                {/* 資訊 */}
                 <div style={{ padding: '0.9rem 1rem' }}>
                   <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.4, marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {video.title}
                   </h3>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <span>{new Date(video.published_at).toLocaleDateString('zh-TW')}</span>
+                    <span>{new Date(video.published_at).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US')}</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Eye size={12} /> {video.view_count.toLocaleString()}
                     </span>

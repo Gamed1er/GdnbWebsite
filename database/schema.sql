@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS youtube_videos (
   thumbnail_url TEXT,
   published_at DATETIME,
   duration TEXT,
+  video_type TEXT NOT NULL DEFAULT 'video',
   view_count INTEGER DEFAULT 0,
   synced_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
