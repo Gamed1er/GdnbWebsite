@@ -48,6 +48,9 @@ next-env.d.ts
 node_modules/
 .next/
 database/*.db
+database/*.db-shm
+database/*.db-wal
+database/*.sql
 public/maps/
 public/images/uploads/
 src/middleware.ts.bak
