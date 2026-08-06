@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import SessionProvider from '@/components/SessionProvider';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 export const metadata: Metadata = {
   title: {
@@ -29,6 +30,7 @@ export default function RootLayout({
       </head>
       <body>
         <SessionProvider>
+          <LanguageProvider>
           <Navbar />
           <main>{children}</main>
           <footer
@@ -43,6 +45,7 @@ export default function RootLayout({
           >
             <p>© {new Date().getFullYear()} 遊戲亡 · gdnb.net</p>
           </footer>
+          </LanguageProvider>
         </SessionProvider>
       </body>
     </html>

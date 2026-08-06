@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Play, Eye } from 'lucide-react';
+import { Play, Eye, Globe } from 'lucide-react';
 
 interface YoutubeVideo {
   id: string;
@@ -39,8 +39,20 @@ export default function VideosPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>影片</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             我的 YouTube 頻道影片，自動同步更新
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              padding: '2px 8px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              borderRadius: '999px',
+              fontSize: '0.75rem',
+              color: 'var(--text-muted)',
+            }}>
+              <Globe size={11} />
+              中文為主 · EN available
+            </span>
           </p>
         </div>
         <a

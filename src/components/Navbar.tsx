@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
+import { useLang } from '@/contexts/LanguageContext';
 
 const navLinks = [
   { href: '/', label: '主頁' },
@@ -16,6 +17,7 @@ const navLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { lang, toggle } = useLang();
 
   return (
     <nav
@@ -29,13 +31,13 @@ export default function Navbar() {
     >
       <div
         style={{
-          maxWidth: '1200px',
+          maxWidth: '1400px',
           margin: '0 auto',
-          padding: '0 1.5rem',
+          padding: '0 2rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: '56px',
+          height: '64px',
         }}
       >
         {/* Logo */}
@@ -43,8 +45,8 @@ export default function Navbar() {
           {/* Minecraft 風格 icon 區域 */}
           <div
             style={{
-              width: '32px',
-              height: '32px',
+              width: '36px',
+              height: '36px',
               background: 'linear-gradient(135deg, #4a7c3f 0%, #2d5a27 50%, #1a3a17 100%)',
               border: '2px solid #6aad5a',
               borderRadius: '4px',
@@ -61,7 +63,7 @@ export default function Navbar() {
             style={{
               color: 'var(--text-primary)',
               fontWeight: 700,
-              fontSize: '1.1rem',
+              fontSize: '1.2rem',
               letterSpacing: '0.02em',
             }}
           >
@@ -85,9 +87,9 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 style={{
-                  padding: '6px 14px',
+                  padding: '7px 16px',
                   borderRadius: '6px',
-                  fontSize: '0.9rem',
+                  fontSize: '0.95rem',
                   textDecoration: 'none',
                   color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
                   background: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
@@ -112,6 +114,39 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          {/* 語言切換 */}
+          <button
+            onClick={toggle}
+            title={lang === 'zh' ? 'Switch to English' : '切換為中文'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              marginLeft: '4px',
+              padding: '5px 11px',
+              borderRadius: '6px',
+              border: '1px solid var(--border)',
+              background: 'transparent',
+              color: 'var(--text-secondary)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              letterSpacing: '0.02em',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)';
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.3)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+            }}
+          >
+            <Globe size={13} />
+            {lang === 'zh' ? 'EN' : '中文'}
+          </button>
         </div>
 
         {/* 手機漢堡選單 */}
