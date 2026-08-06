@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import TagManager from './TagManager';
 import ImageUpload from './ImageUpload';
 import FileUpload from './FileUpload';
@@ -85,6 +87,40 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 圖片貼上上傳並插入 Markdown 引用
+  const handleImagePaste = useCallback(async (
+    e: React.ClipboardEvent<HTMLTextAreaElement>,
+    field: 'description' | 'content',
+    ref: React.RefObject<HTMLTextAreaElement | null>
+  ) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (!file) return;
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/admin/upload?type=image', { method: 'POST', body: fd });
+        const data = await res.json() as { path?: string };
+        if (!data.path) return;
+        const el = ref.current;
+        if (!el) return;
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const md = `![](${data.path})`;
+        const newVal = el.value.slice(0, start) + md + el.value.slice(end);
+        set(field, newVal);
+        setTimeout(() => {
+          el.selectionStart = el.selectionEnd = start + md.length;
+          autoResize(el);
+        }, 0);
+        return;
+      }
+    }
+  }, [autoResize, set]);
+
   const addExtraLink = () => set('extra_links', [...form.extra_links, { label: '', url: '' }]);
   const updateExtraLink = (i: number, field: 'label' | 'url', val: string) => {
     const links = [...form.extra_links];
@@ -150,29 +186,56 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">
           {postType === 'blog' ? '摘要（選填）' : '描述'}
+          {postType !== 'blog' && <span className="text-gray-500 font-normal ml-2 text-xs">支援 Markdown，Ctrl+V 可貼上圖片</span>}
         </label>
-        <textarea
-          ref={descRef}
-          value={form.description}
-          onChange={e => { set('description', e.target.value); autoResize(e.target); }}
-          rows={postType === 'blog' ? 3 : 12}
-          placeholder={postType === 'blog' ? '簡短描述' : '支援 Markdown，詳細說明內容...'}
-          className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden"
-        />
+        <div style={{ display: 'grid', gridTemplateColumns: postType === 'blog' ? '1fr' : '1fr 1fr', gap: '0.75rem' }}>
+          <textarea
+            ref={descRef}
+            value={form.description}
+            onChange={e => { set('description', e.target.value); autoResize(e.target); }}
+            onPaste={e => { void handleImagePaste(e, 'description', descRef); }}
+            rows={postType === 'blog' ? 3 : 12}
+            placeholder={postType === 'blog' ? '簡短描述' : '# 標題\n\n在這裡用 Markdown 撰寫描述...'}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden"
+          />
+          {postType !== 'blog' && (
+            <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 overflow-auto text-sm" style={{ minHeight: '12lh' }}>
+              {form.description ? (
+                <div className="markdown-body">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{form.description}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-gray-600">預覽</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Blog content (Markdown) */}
       {postType === 'blog' && (
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">內容（Markdown）</label>
-          <textarea
-            ref={contentRef}
-            value={form.content}
-            onChange={e => { set('content', e.target.value); autoResize(e.target); }}
-            rows={18}
-            placeholder="# 標題&#10;&#10;在這裡用 Markdown 撰寫文章..."
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden font-mono"
-          />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <textarea
+              ref={contentRef}
+              value={form.content}
+              onChange={e => { set('content', e.target.value); autoResize(e.target); }}
+              onPaste={e => { void handleImagePaste(e, 'content', contentRef); }}
+              rows={18}
+              placeholder="# 標題&#10;&#10;在這裡用 Markdown 撰寫文章..."
+              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden font-mono"
+            />
+            <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 overflow-auto text-sm" style={{ minHeight: '18lh' }}>
+              {form.content ? (
+                <div className="markdown-body">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{form.content}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-gray-600">預覽</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
