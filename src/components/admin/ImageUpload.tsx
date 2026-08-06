@@ -27,6 +27,8 @@ export default function ImageUpload({ value, onChange }: Props) {
   // Ctrl+V paste support
   useEffect(() => {
     const handler = (e: ClipboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       const items = e.clipboardData?.items;
       if (!items) return;
       for (const item of Array.from(items)) {
