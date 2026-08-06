@@ -137,21 +137,36 @@ export default function MinecraftPage() {
                     {map.file_size && <span>{formatBytes(map.file_size)}</span>}
                   </div>
 
-                  {/* 下載按鈕（stopPropagation 避免觸發卡片導覽） */}
-                  <a
-                    href={`/api/download/${map.id}`}
-                    style={{
-                      padding: '9px 0', background: '#22c55e', color: 'white',
-                      borderRadius: '7px', textDecoration: 'none', textAlign: 'center',
-                      fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setMaps((prev) => prev.map((m) => m.id === map.id ? { ...m, downloads: m.downloads + 1 } : m));
-                    }}
-                  >
-                    <Download size={15} /> {t.downloadMap}
-                  </a>
+                  {/* 下載按鈕區 */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <a
+                      href={`/api/download/${map.id}?type=map`}
+                      style={{
+                        padding: '9px 0', background: '#22c55e', color: 'white',
+                        borderRadius: '7px', textDecoration: 'none', textAlign: 'center',
+                        fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMaps((prev) => prev.map((m) => m.id === map.id ? { ...m, downloads: m.downloads + 1 } : m));
+                      }}
+                    >
+                      <Download size={15} /> {t.downloadMap}
+                    </a>
+                    {map.resourcepack_path && (
+                      <a
+                        href={`/api/download/${map.id}?type=resourcepack`}
+                        style={{
+                          padding: '8px 0', background: 'var(--bg-secondary)', color: 'var(--text-primary)',
+                          border: '1px solid var(--border)', borderRadius: '7px', textDecoration: 'none', textAlign: 'center',
+                          fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Package size={14} /> {lang === 'zh' ? '下載資源包' : 'Download Resourcepack'}
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
           ))}
