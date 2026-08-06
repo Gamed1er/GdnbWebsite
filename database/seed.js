@@ -34,13 +34,17 @@ for (const sql of migrations) {
 }
 
 // ── Admin 帳號 ───────────────────────────────────────────
+// ⚠️  上線前請把下面的密碼改掉！
+const ADMIN_PASSWORD = 'password123';
+
 const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
+const hash = bcrypt.hashSync(ADMIN_PASSWORD, 10);
 if (!existingAdmin) {
-  const hash = bcrypt.hashSync('password123', 10);
   db.prepare('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)').run('admin', hash, 'admin');
-  console.log('✅ 建立 admin 帳號（密碼：password123），請登入後立即更改！');
+  console.log(`✅ 建立 admin 帳號（密碼：${ADMIN_PASSWORD}）`);
 } else {
-  console.log('ℹ️  Admin 帳號已存在，跳過');
+  db.prepare('UPDATE users SET password_hash = ? WHERE username = ?').run(hash, 'admin');
+  console.log(`✅ 更新 admin 密碼為：${ADMIN_PASSWORD}`);
 }
 
 // ── 作品集測試資料 ────────────────────────────────────────
@@ -132,5 +136,5 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('✅ 建立 public/images/uploads 目錄');
 }
 
-console.log('✅ Seed 完成！admin 帳號：admin / password123');
+console.log(`✅ Seed 完成！admin 帳號：admin / ${ADMIN_PASSWORD}`);
 db.close();

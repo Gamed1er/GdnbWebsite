@@ -42,3 +42,12 @@ next-env.d.ts
 
 #.archive files
 *.zip
+
+.env.local
+.env
+node_modules/
+.next/
+database/*.db
+public/maps/
+public/images/uploads/
+src/middleware.ts.bak
