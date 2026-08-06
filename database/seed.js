@@ -34,17 +34,18 @@ for (const sql of migrations) {
 }
 
 // ── Admin 帳號 ───────────────────────────────────────────
-// ⚠️  上線前請把下面的密碼改掉！
-const ADMIN_PASSWORD = 'password123';
+// ⚠️  上線前請把帳號和密碼改掉！
+const ADMIN_USERNAME = 'admin';   // ← 改這裡
+const ADMIN_PASSWORD = 'password123';  // ← 改這裡
 
-const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
+const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
 const hash = bcrypt.hashSync(ADMIN_PASSWORD, 10);
 if (!existingAdmin) {
-  db.prepare('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)').run('admin', hash, 'admin');
-  console.log(`✅ 建立 admin 帳號（密碼：${ADMIN_PASSWORD}）`);
+  db.prepare('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)').run(ADMIN_USERNAME, hash, 'admin');
+  console.log(`✅ 建立帳號（帳號：${ADMIN_USERNAME}，密碼：${ADMIN_PASSWORD}）`);
 } else {
-  db.prepare('UPDATE users SET password_hash = ? WHERE username = ?').run(hash, 'admin');
-  console.log(`✅ 更新 admin 密碼為：${ADMIN_PASSWORD}`);
+  db.prepare('UPDATE users SET password_hash = ? WHERE username = ?').run(hash, ADMIN_USERNAME);
+  console.log(`✅ 更新密碼（帳號：${ADMIN_USERNAME}，密碼：${ADMIN_PASSWORD}）`);
 }
 
 // ── 作品集測試資料 ────────────────────────────────────────
@@ -136,5 +137,5 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('✅ 建立 public/images/uploads 目錄');
 }
 
-console.log(`✅ Seed 完成！admin 帳號：admin / ${ADMIN_PASSWORD}`);
+console.log(`✅ Seed 完成！帳號：${ADMIN_USERNAME} / ${ADMIN_PASSWORD}`);
 db.close();
