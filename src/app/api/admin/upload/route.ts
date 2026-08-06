@@ -25,14 +25,14 @@ export async function POST(req: Request) {
     publicPath = '/maps';
   } else {
     saveDir = path.join(process.cwd(), 'public', 'images', 'uploads');
-    publicPath = '/images/uploads';
+    publicPath = '/api/uploads';
   }
 
   if (!fs.existsSync(saveDir)) fs.mkdirSync(saveDir, { recursive: true });
 
-  // 使用時間戳避免衝突
+  // 使用時間戳 + 隨機碼，避免特殊字元造成 404
   const ext = path.extname(file.name) || (uploadType === 'image' ? '.jpg' : '.zip');
-  const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
   const filepath = path.join(saveDir, filename);
 
   fs.writeFileSync(filepath, buffer);
