@@ -45,7 +45,7 @@ export default function NewPostPage() {
   const meta = types.find(t => t.id === selected)!;
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-7xl">
       <div className="flex items-center gap-3 mb-8">
         <span className={`p-2 rounded-xl border ${meta.color}`}>{meta.icon}</span>
         <div>
