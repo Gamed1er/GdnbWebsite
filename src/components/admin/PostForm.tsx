@@ -135,10 +135,10 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
         </label>
         <textarea
           value={form.description}
-          onChange={e => set('description', e.target.value)}
-          rows={3}
-          placeholder="簡短描述"
-          className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none"
+          onChange={e => { set('description', e.target.value); e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+          rows={postType === 'blog' ? 3 : 12}
+          placeholder={postType === 'blog' ? '簡短描述' : '支援 Markdown，詳細說明內容...'}
+          className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden"
         />
       </div>
 
@@ -148,10 +148,10 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
           <label className="block text-sm font-medium text-gray-300 mb-2">內容（Markdown）</label>
           <textarea
             value={form.content}
-            onChange={e => set('content', e.target.value)}
+            onChange={e => { set('content', e.target.value); e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
             rows={18}
             placeholder="# 標題&#10;&#10;在這裡用 Markdown 撰寫文章..."
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-y font-mono"
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden font-mono"
           />
         </div>
       )}
