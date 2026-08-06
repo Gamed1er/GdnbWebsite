@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import TagManager from './TagManager';
@@ -66,6 +66,24 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
 
   const set = (key: keyof FormState, value: unknown) =>
     setForm(prev => ({ ...prev, [key]: value }));
+
+  const descRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = useCallback((el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    const scrollY = window.scrollY;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+    window.scrollTo({ top: scrollY, behavior: 'instant' } as ScrollToOptions);
+  }, []);
+
+  // 編輯模式：載入時根據已有內容設定初始高度
+  useEffect(() => {
+    autoResize(descRef.current);
+    autoResize(contentRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addExtraLink = () => set('extra_links', [...form.extra_links, { label: '', url: '' }]);
   const updateExtraLink = (i: number, field: 'label' | 'url', val: string) => {
@@ -134,8 +152,9 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
           {postType === 'blog' ? '摘要（選填）' : '描述'}
         </label>
         <textarea
+          ref={descRef}
           value={form.description}
-          onChange={e => { set('description', e.target.value); e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+          onChange={e => { set('description', e.target.value); autoResize(e.target); }}
           rows={postType === 'blog' ? 3 : 12}
           placeholder={postType === 'blog' ? '簡短描述' : '支援 Markdown，詳細說明內容...'}
           className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden"
@@ -147,8 +166,9 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">內容（Markdown）</label>
           <textarea
+            ref={contentRef}
             value={form.content}
-            onChange={e => { set('content', e.target.value); e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+            onChange={e => { set('content', e.target.value); autoResize(e.target); }}
             rows={18}
             placeholder="# 標題&#10;&#10;在這裡用 Markdown 撰寫文章..."
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm resize-none overflow-hidden font-mono"
