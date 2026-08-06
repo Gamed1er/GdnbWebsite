@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { Upload, X, ClipboardPaste } from 'lucide-react';
 
 interface Props {
@@ -53,7 +52,8 @@ export default function ImageUpload({ value, onChange }: Props) {
       {value ? (
         <div className="relative group">
           <div className="relative w-full h-48 rounded-xl overflow-hidden bg-gray-800">
-            <Image src={value} alt="封面" fill className="object-cover" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={value} alt="封面" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <button
             type="button"

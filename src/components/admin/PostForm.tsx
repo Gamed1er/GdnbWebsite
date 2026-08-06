@@ -53,7 +53,7 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
     content: '',
     cover_image: '',
     tags: [],
-    published: false,
+    published: true,
     github_url: '',
     extra_links: [],
     file_path: '',
@@ -266,9 +266,9 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
         <button
           type="button"
           onClick={() => set('published', !form.published)}
-          className={`relative w-11 h-6 rounded-full transition-colors ${form.published ? 'bg-blue-600' : 'bg-gray-700'}`}
+          className={`relative w-11 h-6 rounded-full transition-colors ${!form.published ? 'bg-yellow-600' : 'bg-gray-700'}`}
         >
-          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${form.published ? 'translate-x-5' : ''}`} />
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${!form.published ? 'translate-x-5' : ''}`} />
         </button>
         <span className="text-sm text-gray-300">
           {form.published ? '已發佈（公開可見）' : '草稿（不公開）'}
