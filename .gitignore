@@ -50,7 +50,6 @@ node_modules/
 database/*.db
 database/*.db-shm
 database/*.db-wal
-database/*.sql
 public/maps/
 public/images/uploads/
 src/middleware.ts.bak
