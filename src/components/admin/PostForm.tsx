@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import TagManager from './TagManager';
 import ImageUpload from './ImageUpload';
 import FileUpload from './FileUpload';
@@ -109,7 +110,7 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
         if (!el) return;
         const start = el.selectionStart;
         const end = el.selectionEnd;
-        const md = `![](${data.path})`;
+        const md = `<img src="${data.path}" width="100%">`;
         const newVal = el.value.slice(0, start) + md + el.value.slice(end);
         set(field, newVal);
         setTimeout(() => {
@@ -202,7 +203,7 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
             <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 overflow-auto text-sm" style={{ minHeight: '12lh' }}>
               {form.description ? (
                 <div className="markdown-body">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{form.description}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{form.description}</ReactMarkdown>
                 </div>
               ) : (
                 <p className="text-gray-600">預覽</p>
@@ -229,7 +230,7 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
             <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 overflow-auto text-sm" style={{ minHeight: '18lh' }}>
               {form.content ? (
                 <div className="markdown-body">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{form.content}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{form.content}</ReactMarkdown>
                 </div>
               ) : (
                 <p className="text-gray-600">預覽</p>

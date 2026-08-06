@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import GithubIcon from '@/components/icons/GithubIcon';
 import BlogInteractions from '@/components/BlogInteractions';
@@ -108,7 +109,7 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
       {/* Markdown 內容 */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '2rem' }}>
         <div className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.description}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{item.description}</ReactMarkdown>
         </div>
       </div>
 

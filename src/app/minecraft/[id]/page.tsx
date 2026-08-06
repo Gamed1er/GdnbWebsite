@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Download, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 
 interface MinecraftMap {
@@ -152,7 +153,7 @@ export default async function MinecraftMapPage({ params }: { params: Promise<{ i
       {/* Markdown 說明 */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '2rem' }}>
         <div className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{map.description}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{map.description}</ReactMarkdown>
         </div>
       </div>
 

@@ -69,13 +69,13 @@ body {
 .markdown-body strong { color: var(--text-primary); }
 .markdown-body a { color: var(--accent-blue-light); text-decoration: underline; }
 .markdown-body img { max-width: 100%; border-radius: 6px; margin: 0.5rem 0; }
-.markdown-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
-.markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 6px 12px; }
+.markdown-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.25); }
+.markdown-body th, .markdown-body td { border: 1px solid rgba(255,255,255,0.25); padding: 6px 12px; }
 .markdown-body th { background: var(--bg-secondary); color: var(--text-primary); }
 .markdown-body code { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 4px; padding: 1px 6px; font-size: 0.88em; color: var(--accent-blue-light); }
 .markdown-body pre { background: #0a0f1a; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
 .markdown-body pre code { background: none; border: none; padding: 0; color: #a8d8f0; }
-.markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+.markdown-body hr { border: none; border-top: 1px solid rgba(255,255,255,0.3); margin: 2rem 0; }
 .markdown-body blockquote { border-left: 3px solid var(--accent-blue); padding-left: 1rem; margin: 1rem 0; color: var(--text-muted); font-style: italic; }
 
 /* Tag 標籤 */
