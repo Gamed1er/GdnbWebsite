@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Eye, Heart, ExternalLink } from 'lucide-react';
 import GithubIcon from '@/components/icons/GithubIcon';
+import { useLang } from '@/contexts/LanguageContext';
+import { ui } from '@/lib/i18n';
 
 interface ExtraLink { label: string; url: string }
 
@@ -22,6 +24,9 @@ interface PortfolioItem {
 
 export default function PortfolioPage() {
   const router = useRouter();
+  const { lang } = useLang();
+  const t = ui[lang].portfolio;
+  const c = ui[lang].common;
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -48,8 +53,8 @@ export default function PortfolioPage() {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>作品集</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>遊戲開發、資工專案，以及各種我做過的東西</p>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{t.title}</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>{t.subtitle}</p>
       </div>
 
       {/* 搜尋 + 標籤 */}
@@ -58,7 +63,7 @@ export default function PortfolioPage() {
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="搜尋作品..."
+            placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ width: '100%', padding: '10px 12px 10px 36px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none' }}
@@ -68,8 +73,8 @@ export default function PortfolioPage() {
         </div>
         {allTags.length > 0 && (
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>標籤：</span>
-            <button onClick={() => setActiveTag(null)} style={tagBtnStyle(activeTag === null)}>全部</button>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{c.tags}</span>
+            <button onClick={() => setActiveTag(null)} style={tagBtnStyle(activeTag === null)}>{c.all}</button>
             {allTags.map((tag) => (
               <button key={tag} onClick={() => setActiveTag(activeTag === tag ? null : tag)} style={tagBtnStyle(activeTag === tag)}>{tag}</button>
             ))}
@@ -77,12 +82,10 @@ export default function PortfolioPage() {
         )}
       </div>
 
-      {!loading && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>共 {filtered.length} 個作品</p>}
-
       {loading ? (
-        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>載入中...</div>
+        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>{c.loading}</div>
       ) : filtered.length === 0 ? (
-        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>找不到符合的作品</div>
+        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>{items.length === 0 ? t.empty : c.noResults}</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
           {filtered.map((item) => (

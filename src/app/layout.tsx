@@ -10,7 +10,17 @@ export const metadata: Metadata = {
     default: '遊戲亡 | Minecraft 地圖・遊戲開發・影音創作',
   },
   description: 'Minecraft 地圖下載、遊戲開發作品集、影音創作 — 遊戲亡的個人網站',
-  metadataBase: new URL('https://gdnb.net'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gdnb.net'),
+  openGraph: {
+    siteName: '遊戲亡',
+    images: [{ url: '/images/og_tags.png', width: 1200, height: 630 }],
+    locale: 'zh_TW',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/images/og_tags.png'],
+  },
 };
 
 export default function RootLayout({

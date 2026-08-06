@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Play, Eye, Globe } from 'lucide-react';
+import { useLang } from '@/contexts/LanguageContext';
+import { ui } from '@/lib/i18n';
 
 interface YoutubeVideo {
   id: string;
@@ -25,6 +27,9 @@ function parseDuration(iso: string): string {
 }
 
 export default function VideosPage() {
+  const { lang } = useLang();
+  const t = ui[lang].videos;
+  const c = ui[lang].common;
   const [videos, setVideos] = useState<YoutubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,9 +43,9 @@ export default function VideosPage() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>影片</h1>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{t.title}</h1>
           <p style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            我的 YouTube 頻道影片，自動同步更新
+            {t.subtitle}
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '4px',
               padding: '2px 8px',
@@ -51,7 +56,7 @@ export default function VideosPage() {
               color: 'var(--text-muted)',
             }}>
               <Globe size={11} />
-              中文為主 · EN available
+              {t.langBadge}
             </span>
           </p>
         </div>
@@ -70,19 +75,17 @@ export default function VideosPage() {
             fontSize: '0.9rem',
           }}
         >
-          ▶ 前往頻道訂閱
+          ▶ {t.subscribeBtn}
         </a>
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>載入中...</div>
+        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>{c.loading}</div>
       ) : videos.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
           <Play size={40} style={{ marginBottom: '1rem', opacity: 0.3 }} />
-          <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>尚未同步任何影片</p>
-          <p style={{ fontSize: '0.85rem' }}>
-            請先設定 YouTube API Key，然後在管理員後台執行同步
-          </p>
+          <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{t.empty}</p>
+          <p style={{ fontSize: '0.85rem' }}>{t.emptyHint}</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>

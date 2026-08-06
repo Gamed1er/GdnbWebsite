@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, Download, Package } from 'lucide-react';
+import { useLang } from '@/contexts/LanguageContext';
+import { ui } from '@/lib/i18n';
 
 interface MinecraftMap {
   id: number;
@@ -26,6 +27,9 @@ function formatBytes(bytes: number | null): string {
 
 export default function MinecraftPage() {
   const router = useRouter();
+  const { lang } = useLang();
+  const t = ui[lang].minecraft;
+  const c = ui[lang].common;
   const [maps, setMaps] = useState<MinecraftMap[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -52,8 +56,8 @@ export default function MinecraftPage() {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>MC 創作下載</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>我製作的 Minecraft 地圖，全部免費下載</p>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{t.title}</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>{t.subtitle}</p>
       </div>
 
       {/* 搜尋 + 標籤 */}
@@ -62,7 +66,7 @@ export default function MinecraftPage() {
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="搜尋地圖..."
+            placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ width: '100%', padding: '10px 12px 10px 36px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none' }}
@@ -72,8 +76,8 @@ export default function MinecraftPage() {
         </div>
         {allTags.length > 0 && (
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>標籤：</span>
-            <button onClick={() => setActiveTag(null)} style={tagBtnStyle(activeTag === null)}>全部</button>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{c.tags}</span>
+            <button onClick={() => setActiveTag(null)} style={tagBtnStyle(activeTag === null)}>{c.all}</button>
             {allTags.map((tag) => (
               <button key={tag} onClick={() => setActiveTag(activeTag === tag ? null : tag)} style={tagBtnStyle(activeTag === tag)}>{tag}</button>
             ))}
@@ -81,14 +85,10 @@ export default function MinecraftPage() {
         )}
       </div>
 
-      {!loading && (
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>共 {filtered.length} 張地圖</p>
-      )}
-
       {loading ? (
-        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>載入中...</div>
+        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>{c.loading}</div>
       ) : filtered.length === 0 ? (
-        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>找不到符合的地圖</div>
+        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '4rem 0' }}>{maps.length === 0 ? t.empty : c.noResults}</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
           {filtered.map((map) => (
@@ -132,7 +132,7 @@ export default function MinecraftPage() {
                   {/* 下載次數 + 大小 */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: 'var(--text-muted)', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Download size={13} /> {map.downloads.toLocaleString()} 次下載
+                      <Download size={13} /> {map.downloads.toLocaleString()} {c.downloads}
                     </span>
                     {map.file_size && <span>{formatBytes(map.file_size)}</span>}
                   </div>
@@ -150,7 +150,7 @@ export default function MinecraftPage() {
                       setMaps((prev) => prev.map((m) => m.id === map.id ? { ...m, downloads: m.downloads + 1 } : m));
                     }}
                   >
-                    <Download size={15} /> 下載地圖
+                    <Download size={15} /> {t.downloadMap}
                   </a>
                 </div>
               </div>

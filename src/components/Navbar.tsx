@@ -5,19 +5,22 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
-
-const navLinks = [
-  { href: '/', label: '主頁' },
-  { href: '/blog', label: '部落格' },
-  { href: '/portfolio', label: '作品集' },
-  { href: '/minecraft', label: 'MC 創作下載' },
-  { href: '/videos', label: '影片' },
-];
+import { ui } from '@/lib/i18n';
+import Image from 'next/image';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { lang, toggle } = useLang();
+  const nav = ui[lang].nav;
+
+  const navLinks = [
+    { href: '/', label: nav.home },
+    { href: '/blog', label: nav.blog },
+    { href: '/portfolio', label: nav.portfolio },
+    { href: '/minecraft', label: nav.minecraft },
+    { href: '/videos', label: nav.videos },
+  ];
 
   return (
     <nav
@@ -31,8 +34,6 @@ export default function Navbar() {
     >
       <div
         style={{
-          maxWidth: '1400px',
-          margin: '0 auto',
           padding: '0 2rem',
           display: 'flex',
           alignItems: 'center',
@@ -43,22 +44,13 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           {/* Minecraft 風格 icon 區域 */}
-          <div
-            style={{
-              width: '36px',
-              height: '36px',
-              background: 'linear-gradient(135deg, #4a7c3f 0%, #2d5a27 50%, #1a3a17 100%)',
-              border: '2px solid #6aad5a',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '16px',
-              imageRendering: 'pixelated',
-            }}
-          >
-            🎮
-          </div>
+          <Image
+            src="/images/avatar.png"
+            alt="遊戲亡"
+            width={36}
+            height={36}
+            style={{ borderRadius: '6px', objectFit: 'cover' }}
+          />
           <span
             style={{
               color: 'var(--text-primary)',

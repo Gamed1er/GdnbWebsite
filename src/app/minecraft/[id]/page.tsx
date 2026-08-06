@@ -37,7 +37,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const map = await getMap(id);
   if (!map) return { title: '找不到地圖' };
-  return { title: map.title };
+  const desc = map.description.replace(/[#*`\[\]]/g, '').slice(0, 160);
+  return {
+    title: map.title,
+    description: desc,
+    openGraph: {
+      title: map.title,
+      description: desc,
+      images: [{ url: map.cover_image ?? '/images/og_tags.png', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: map.title,
+      images: [map.cover_image ?? '/images/og_tags.png'],
+    },
+  };
 }
 
 export default async function MinecraftMapPage({ params }: { params: Promise<{ id: string }> }) {
