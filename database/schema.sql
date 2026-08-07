@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS minecraft_maps (
   cover_image TEXT,
   file_path TEXT NOT NULL,
   file_size INTEGER,
+  datapack_path TEXT,
+  datapack_size INTEGER,
   resourcepack_path TEXT,
   resourcepack_size INTEGER,
   version TEXT,

@@ -11,7 +11,9 @@ interface MinecraftMap {
   title: string;
   excerpt: string;
   cover_image: string | null;
+  file_path: string | null;
   file_size: number | null;
+  datapack_path: string | null;
   resourcepack_path: string | null;
   version: string | null;
   tags: string[];
@@ -139,20 +141,35 @@ export default function MinecraftPage() {
 
                   {/* 下載按鈕區 */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <a
-                      href={`/api/download/${map.id}?type=map`}
-                      style={{
-                        padding: '9px 0', background: '#22c55e', color: 'white',
-                        borderRadius: '7px', textDecoration: 'none', textAlign: 'center',
-                        fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMaps((prev) => prev.map((m) => m.id === map.id ? { ...m, downloads: m.downloads + 1 } : m));
-                      }}
-                    >
-                      <Download size={15} /> {t.downloadMap}
-                    </a>
+                    {map.file_path && (
+                      <a
+                        href={`/api/download/${map.id}?type=map`}
+                        style={{
+                          padding: '9px 0', background: '#22c55e', color: 'white',
+                          borderRadius: '7px', textDecoration: 'none', textAlign: 'center',
+                          fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMaps((prev) => prev.map((m) => m.id === map.id ? { ...m, downloads: m.downloads + 1 } : m));
+                        }}
+                      >
+                        <Download size={15} /> {lang === 'zh' ? '下載地圖' : 'Download Map'}
+                      </a>
+                    )}
+                    {map.datapack_path && (
+                      <a
+                        href={`/api/download/${map.id}?type=datapack`}
+                        style={{
+                          padding: '8px 0', background: '#f59e0b', color: 'white',
+                          borderRadius: '7px', textDecoration: 'none', textAlign: 'center',
+                          fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Package size={14} /> {lang === 'zh' ? '下載資料包' : 'Download Datapack'}
+                      </a>
+                    )}
                     {map.resourcepack_path && (
                       <a
                         href={`/api/download/${map.id}?type=resourcepack`}

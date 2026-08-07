@@ -11,8 +11,10 @@ interface MinecraftMap {
   title: string;
   description: string;
   cover_image: string | null;
-  file_path: string;
+  file_path: string | null;
   file_size: number | null;
+  datapack_path: string | null;
+  datapack_size: number | null;
   resourcepack_path: string | null;
   resourcepack_size: number | null;
   version: string | null;
@@ -112,18 +114,36 @@ export default async function MinecraftMapPage({ params }: { params: Promise<{ i
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {/* 地圖下載 */}
-          <a
-            href={`/api/download/${map.id}?type=map`}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '11px 22px', background: '#22c55e', color: 'white',
-              borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '0.95rem',
-            }}
-          >
-            <Download size={17} />
-            下載地圖
-            {map.file_size && <span style={{ opacity: 0.8, fontSize: '0.82rem' }}>（{formatBytes(map.file_size)}）</span>}
-          </a>
+          {map.file_path && (
+            <a
+              href={`/api/download/${map.id}?type=map`}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '11px 22px', background: '#22c55e', color: 'white',
+                borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '0.95rem',
+              }}
+            >
+              <Download size={17} />
+              下載地圖
+              {map.file_size && <span style={{ opacity: 0.8, fontSize: '0.82rem' }}>（{formatBytes(map.file_size)}）</span>}
+            </a>
+          )}
+
+          {/* 資料包下載（若有） */}
+          {map.datapack_path && (
+            <a
+              href={`/api/download/${map.id}?type=datapack`}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '11px 22px', background: '#f59e0b', color: 'white',
+                borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '0.95rem',
+              }}
+            >
+              <Download size={17} />
+              下載資料包
+              {map.datapack_size && <span style={{ opacity: 0.8, fontSize: '0.82rem' }}>（{formatBytes(map.datapack_size)}）</span>}
+            </a>
+          )}
 
           {/* 資源包下載（若有） */}
           {map.resourcepack_path && (

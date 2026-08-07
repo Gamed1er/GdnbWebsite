@@ -26,6 +26,7 @@ export async function PUT(req: Request, { params }: { params: Params }) {
     UPDATE minecraft_maps SET
       title = ?, description = ?, cover_image = ?,
       file_path = ?, file_size = ?,
+      datapack_path = ?, datapack_size = ?,
       resourcepack_path = ?, resourcepack_size = ?,
       version = ?, tags = ?, published = ?, sort_order = ?,
       updated_at = CURRENT_TIMESTAMP
@@ -33,7 +34,8 @@ export async function PUT(req: Request, { params }: { params: Params }) {
   `).run(
     body.title, body.description,
     body.cover_image || null,
-    body.file_path, body.file_size || null,
+    body.file_path || null, body.file_size || null,
+    body.datapack_path || null, body.datapack_size || null,
     body.resourcepack_path || null, body.resourcepack_size || null,
     body.version || null,
     JSON.stringify(body.tags ?? []),
@@ -49,11 +51,11 @@ export async function DELETE(_req: Request, { params }: { params: Params }) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
   const db = getDb();
-  const item = db.prepare('SELECT file_path, resourcepack_path FROM minecraft_maps WHERE id = ?').get(Number(id)) as { file_path: string; resourcepack_path: string | null } | undefined;
+  const item = db.prepare('SELECT file_path, datapack_path, resourcepack_path FROM minecraft_maps WHERE id = ?').get(Number(id)) as { file_path: string | null; datapack_path: string | null; resourcepack_path: string | null } | undefined;
 
   // 刪除實體檔案（若存在）
   if (item) {
-    for (const p of [item.file_path, item.resourcepack_path]) {
+    for (const p of [item.file_path, item.datapack_path, item.resourcepack_path]) {
       if (p) {
         const abs = path.join(process.cwd(), 'public', p);
         if (fs.existsSync(abs)) fs.unlinkSync(abs);

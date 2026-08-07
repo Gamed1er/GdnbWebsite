@@ -5,7 +5,8 @@ export function GET() {
   const db = getDb();
   const maps = db
     .prepare(
-      `SELECT id, title, description, cover_image, file_size, resourcepack_path,
+      `SELECT id, title, description, cover_image, file_path, file_size,
+              datapack_path, datapack_size, resourcepack_path,
               resourcepack_size, version, tags, downloads, created_at
        FROM minecraft_maps
        WHERE published = 1

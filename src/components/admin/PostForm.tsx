@@ -28,6 +28,8 @@ interface FormState {
   // Minecraft
   file_path: string;
   file_size: number;
+  datapack_path: string;
+  datapack_size: number;
   resourcepack_path: string;
   resourcepack_size: number;
   version: string;
@@ -61,6 +63,8 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
     extra_links: [],
     file_path: '',
     file_size: 0,
+    datapack_path: '',
+    datapack_size: 0,
     resourcepack_path: '',
     resourcepack_size: 0,
     version: '',
@@ -133,7 +137,7 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) { setError('請填寫標題'); return; }
-    if (postType === 'minecraft' && !form.file_path) { setError('請上傳地圖檔案'); return; }
+    if (postType === 'minecraft' && !form.file_path && !form.datapack_path && !form.resourcepack_path) { setError('請至少上傳一個檔案（地圖、資料包或資源包）'); return; }
 
     setSaving(true);
     setError('');
@@ -324,13 +328,23 @@ export default function PostForm({ postType, initialData, isEdit }: Props) {
               className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
             />
           </div>
+          <p className="text-xs text-gray-500 -mt-1">至少上傳以下其中一個檔案</p>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">地圖檔案 *</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">地圖（選填）</label>
             <FileUpload
               value={form.file_path}
               onChange={(path, size) => { set('file_path', path); set('file_size', size ?? 0); }}
               uploadType="map"
               label="上傳地圖 .zip 檔"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">資料包（選填）</label>
+            <FileUpload
+              value={form.datapack_path}
+              onChange={(path, size) => { set('datapack_path', path); set('datapack_size', size ?? 0); }}
+              uploadType="map"
+              label="上傳資料包 .zip 檔"
             />
           </div>
           <div>

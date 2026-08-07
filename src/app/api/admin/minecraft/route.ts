@@ -10,12 +10,13 @@ export async function POST(req: Request) {
   const db = getDb();
 
   const result = db.prepare(`
-    INSERT INTO minecraft_maps (title, description, cover_image, file_path, file_size, resourcepack_path, resourcepack_size, version, tags, published, sort_order)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO minecraft_maps (title, description, cover_image, file_path, file_size, datapack_path, datapack_size, resourcepack_path, resourcepack_size, version, tags, published, sort_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     body.title, body.description,
     body.cover_image || null,
-    body.file_path, body.file_size || null,
+    body.file_path || null, body.file_size || null,
+    body.datapack_path || null, body.datapack_size || null,
     body.resourcepack_path || null, body.resourcepack_size || null,
     body.version || null,
     JSON.stringify(body.tags ?? []),

@@ -10,7 +10,8 @@ type Params = Promise<{ id: string }>;
 export async function GET(req: Request, { params }: { params: Params }) {
   const { id } = await params;
   const { searchParams } = new URL(req.url);
-  const type = searchParams.get('type') === 'resourcepack' ? 'resourcepack' : 'map';
+  const rawType = searchParams.get('type');
+  const type = rawType === 'resourcepack' ? 'resourcepack' : rawType === 'datapack' ? 'datapack' : 'map';
 
   const db = getDb();
   const map = db
@@ -22,10 +23,12 @@ export async function GET(req: Request, { params }: { params: Params }) {
   // 決定檔案路徑
   const filePath = type === 'resourcepack'
     ? (map.resourcepack_path as string | null)
-    : (map.file_path as string);
+    : type === 'datapack'
+    ? (map.datapack_path as string | null)
+    : (map.file_path as string | null);
 
   if (!filePath) {
-    return NextResponse.json({ error: '此地圖沒有資源包' }, { status: 404 });
+    return NextResponse.json({ error: '找不到對應檔案' }, { status: 404 });
   }
 
   // 檔案在 public 資料夾下
