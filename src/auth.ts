@@ -46,13 +46,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // 只有 Google 登入才寫入 public_users
       if (account?.provider !== 'google') return true;
 
+      const email = user.email ?? '';
+
       const { default: getDb } = await import('@/lib/db');
       const db = getDb();
 
       const googleId = account.providerAccountId;
-      const email = user.email ?? '';
       const name = user.name ?? '使用者';
       const avatarUrl = user.image ?? null;
+
+      // ── 管理員 Google 帳號：建/更新 public_users 但設 role=admin ──
+      const adminEmail = process.env.ADMIN_EMAIL;
+      const isAdmin = adminEmail && email === adminEmail;
 
       // 查找或建立使用者
       let existing = db
@@ -67,34 +72,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .prepare('SELECT id, is_banned, ban_until FROM public_users WHERE google_id = ?')
           .get(googleId) as { id: number; is_banned: number; ban_until: string | null };
       } else {
-        // 更新最新的名字和頭貼（若使用者沒有自訂）
+        // 只在沒有自訂頭貼時才更新 Google 頭貼
         db.prepare(
-          'UPDATE public_users SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE google_id = ? AND avatar_url NOT LIKE \'/api/uploads/%\''
+          `UPDATE public_users SET name = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE google_id = ? AND (avatar_url IS NULL OR avatar_url LIKE 'https://%')`
         ).run(name, googleId);
       }
 
-      // 禁言檢查
-      if (existing.is_banned) {
-        if (!existing.ban_until) return false; // 永久禁言
-        if (new Date(existing.ban_until) > new Date()) return false; // 有限期禁言還沒結束
-        // 禁言已到期，自動解除
+      // 禁言檢查（管理員跳過）
+      if (!isAdmin && existing.is_banned) {
+        if (!existing.ban_until) return false;
+        if (new Date(existing.ban_until) > new Date()) return false;
         db.prepare('UPDATE public_users SET is_banned = 0, ban_until = NULL WHERE id = ?').run(existing.id);
       }
 
-      // 把 publicUserId 塞進 user 物件，jwt callback 會取用
+      // 把 publicUserId 和 role 塞進 user 物件
       (user as Record<string, unknown>).publicUserId = existing.id;
-      (user as Record<string, unknown>).role = 'user';
+      (user as Record<string, unknown>).role = isAdmin ? 'admin' : 'user';
 
       return true;
     },
 
-    jwt({ token, user, account }) {
+    jwt({ token, user }) {
       if (user) {
+        // role 由 signIn callback 設定（admin 或 user），不在這裡覆蓋
         token.role = (user as Record<string, unknown>).role ?? 'user';
         token.publicUserId = (user as Record<string, unknown>).publicUserId;
-      }
-      if (account?.provider === 'google') {
-        token.role = 'user';
       }
       return token;
     },

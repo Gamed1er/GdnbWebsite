@@ -6,14 +6,10 @@ export default {
   session: { strategy: 'jwt' },
   providers: [], // providers 在 auth.ts 中定義
   callbacks: {
-    jwt({ token, user, account }) {
+    jwt({ token, user }) {
       if (user) {
         token.role = (user as Record<string, unknown>).role ?? 'user';
         token.publicUserId = (user as Record<string, unknown>).publicUserId;
-      }
-      // Google OAuth 登入：標記 role=user
-      if (account?.provider === 'google') {
-        token.role = 'user';
       }
       return token;
     },
@@ -31,7 +27,13 @@ export default {
       if (!isAdmin || isLogin) return true;
 
       const role = (auth?.user as unknown as Record<string, unknown>)?.role;
-      return role === 'admin';
+      if (role === 'admin') return true;
+
+      // 已登入但非 admin → 重導首頁
+      if (auth) return Response.redirect(new URL('/', request.nextUrl));
+
+      // 未登入 → 重導登入頁
+      return false;
     },
   },
 } satisfies NextAuthConfig;

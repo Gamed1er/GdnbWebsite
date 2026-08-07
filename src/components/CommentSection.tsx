@@ -33,7 +33,8 @@ function Avatar({ src, name, size = 32 }: { src?: string | null; name: string; s
   return src ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={name} width={size} height={size}
-      style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(255,255,255,0.15)' }} />
+      style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(255,255,255,0.15)', display: 'block' }}
+      referrerPolicy="no-referrer" />
   ) : (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,

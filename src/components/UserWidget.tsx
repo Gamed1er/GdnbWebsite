@@ -240,12 +240,43 @@ export default function UserWidget() {
                 </div>
               )}
 
-              {/* 登出 */}
-              <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--border)' }}>
+              {/* 快捷連結 */}
+              <div style={{ padding: '0.5rem 0.75rem', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                {/* 管理員入口（只有 admin 才顯示） */}
+                {me.role === 'admin' && (
+                  <a
+                    href="/admin"
+                    style={{
+                      display: 'block', width: '100%', padding: '0.45rem 0.6rem', borderRadius: 6,
+                      background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
+                      color: 'var(--accent-blue-light)', fontSize: '0.85rem', textDecoration: 'none',
+                      textAlign: 'center', transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(59,130,246,0.25)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(59,130,246,0.12)')}
+                  >
+                    ⚙️ 進入管理員後台
+                  </a>
+                )}
+                {/* 個人設定（所有登入用戶） */}
+                <a
+                    href="/profile"
+                    style={{
+                      display: 'block', width: '100%', padding: '0.45rem 0.6rem', borderRadius: 6,
+                      background: 'transparent', border: '1px solid var(--border)',
+                      color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none',
+                      textAlign: 'center', transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    個人設定
+                </a>
+                {/* 登出 */}
                 <button
                   onClick={() => signOut()}
                   style={{
-                    width: '100%', padding: '0.5rem', borderRadius: 6,
+                    width: '100%', padding: '0.45rem', borderRadius: 6,
                     background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
                     color: '#f87171', fontSize: '0.85rem', cursor: 'pointer',
                     transition: 'background 0.15s',
