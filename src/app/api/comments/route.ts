@@ -36,17 +36,17 @@ export async function GET(req: Request) {
       u.name as author_name, u.nickname as author_nickname, u.avatar_url as author_avatar
     FROM comments c
     JOIN public_users u ON c.user_id = u.id
-    WHERE c.post_type = ? AND c.post_id = ? AND c.parent_id IS NULL
+    WHERE c.post_type = ? AND c.post_id = ? AND c.parent_id IS NULL AND c.is_deleted = 0
     ORDER BY c.created_at ASC
   `).all(postType, postId) as DbComment[];
 
-  // 取所有回覆
+  // 取所有回覆（也過濾已刪除）
   const replies = db.prepare(`
     SELECT c.*,
       u.name as author_name, u.nickname as author_nickname, u.avatar_url as author_avatar
     FROM comments c
     JOIN public_users u ON c.user_id = u.id
-    WHERE c.post_type = ? AND c.post_id = ? AND c.parent_id IS NOT NULL
+    WHERE c.post_type = ? AND c.post_id = ? AND c.parent_id IS NOT NULL AND c.is_deleted = 0
     ORDER BY c.created_at ASC
   `).all(postType, postId) as DbComment[];
 
@@ -95,6 +95,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '留言太頻繁，請稍後再試（每分鐘最多 5 則）' }, { status: 429 });
   }
 
+  // 封禁檢查
+  const db = getDb();
+  const userRecord = db.prepare('SELECT is_banned, ban_until FROM public_users WHERE id = ?')
+    .get(publicUserId) as { is_banned: number; ban_until: string | null } | undefined;
+  if (userRecord?.is_banned) {
+    const permanent = !userRecord.ban_until;
+    const expired = !permanent && new Date(userRecord.ban_until!) <= new Date();
+    if (!expired) {
+      const msg = permanent ? '你已被永久封禁，無法留言' : `你已被封禁至 ${new Date(userRecord.ban_until!).toLocaleDateString('zh-TW')}`;
+      return NextResponse.json({ error: msg }, { status: 403 });
+    }
+    // 封禁已到期，自動解除
+    db.prepare('UPDATE public_users SET is_banned = 0, ban_until = NULL WHERE id = ?').run(publicUserId);
+  }
+
   const body = await req.json() as {
     post_type: string; post_id: number;
     content: string; parent_id?: number;
@@ -114,8 +129,6 @@ export async function POST(req: Request) {
   if (filter.blocked) {
     return NextResponse.json({ error: '留言包含不允許的內容' }, { status: 400 });
   }
-
-  const db = getDb();
 
   // 確認 parent 存在且是頂層留言（防止超過一層巢狀）
   if (parent_id) {

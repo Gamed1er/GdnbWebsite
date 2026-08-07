@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Trash2, Flag, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Trash2, Flag, ChevronLeft, ChevronRight, ExternalLink, ArrowLeft } from 'lucide-react';
 
 interface AdminComment {
   id: number;
@@ -26,20 +28,30 @@ const POST_TYPE_URL: Record<string, (id: number) => string> = {
   minecraft: id => `/minecraft/${id}`,
 };
 
-export default function AdminCommentsPage() {
+function AdminCommentsPage() {
+  const searchParams = useSearchParams();
+  // 從 URL 讀取貼文過濾（從儀表板點進來時帶有這兩個參數）
+  const urlPostType = searchParams.get('post_type') ?? '';
+  const urlPostId = searchParams.get('post_id') ?? '';
+  const urlPostTitle = searchParams.get('title') ?? '';
+
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [postType, setPostType] = useState('');
+  const [postType, setPostType] = useState(urlPostType);
   const [reported, setReported] = useState(false);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [deleting, setDeleting] = useState<number | null>(null);
 
+  // 是否是「特定貼文」模式
+  const isPostSpecific = !!urlPostId;
+
   const fetchComments = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page) });
     if (postType) params.set('post_type', postType);
+    if (urlPostId) params.set('post_id', urlPostId);
     if (reported) params.set('reported', '1');
     const res = await fetch(`/api/admin/comments?${params}`);
     const data = await res.json() as { comments: AdminComment[]; total: number; pages: number };
@@ -47,7 +59,7 @@ export default function AdminCommentsPage() {
     setTotal(data.total);
     setPages(data.pages);
     setLoading(false);
-  }, [page, postType, reported]);
+  }, [page, postType, urlPostId, reported]);
 
   useEffect(() => { void fetchComments(); }, [fetchComments]);
 
@@ -64,15 +76,32 @@ export default function AdminCommentsPage() {
 
   return (
     <div>
+      {/* 標題 */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">留言管理</h1>
+        <div className="flex items-center gap-3">
+          {isPostSpecific && (
+            <Link href="/admin/comments" className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <ArrowLeft size={18} />
+            </Link>
+          )}
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              {isPostSpecific ? `「${urlPostTitle || '貼文'}」的留言` : '留言管理'}
+            </h1>
+            {isPostSpecific && (
+              <p className="text-gray-500 text-sm mt-0.5">
+                {POST_TYPE_LABEL[urlPostType] ?? urlPostType} · ID {urlPostId}
+              </p>
+            )}
+          </div>
+        </div>
         <span className="text-gray-400 text-sm">共 {total} 則</span>
       </div>
 
-      {/* 過濾器 */}
+      {/* 過濾器（貼文模式不顯示類型切換） */}
       <div className="flex gap-3 mb-6 flex-wrap">
         <div className="flex gap-1">
-          {(['', 'blog', 'portfolio', 'minecraft'] as const).map(t => (
+          {!isPostSpecific && (['', 'blog', 'portfolio', 'minecraft'] as const).map(t => (
             <button
               key={t}
               onClick={() => setPostType(t)}
@@ -199,5 +228,15 @@ export default function AdminCommentsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// useSearchParams 需要 Suspense 包裹
+import { Suspense } from 'react';
+export default function AdminCommentsPageWrapper() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-32"><div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>}>
+      <AdminCommentsPage />
+    </Suspense>
   );
 }

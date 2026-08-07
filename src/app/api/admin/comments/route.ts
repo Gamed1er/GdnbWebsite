@@ -15,6 +15,7 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const postType = searchParams.get('post_type') ?? '';
+  const postId = searchParams.get('post_id') ? Number(searchParams.get('post_id')) : null;
   const reported = searchParams.get('reported') === '1';
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'));
   const limit = 30;
@@ -30,6 +31,10 @@ export async function GET(req: Request) {
   if (postType) {
     where += ` AND c.post_type = ?`;
     params.push(postType);
+  }
+  if (postId) {
+    where += ` AND c.post_id = ?`;
+    params.push(postId);
   }
 
   const rows = db.prepare(`

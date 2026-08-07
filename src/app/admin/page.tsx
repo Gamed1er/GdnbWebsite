@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, Pencil, Trash2, Eye, Heart, Download, Plus, Newspaper, FolderKanban, Map, Eraser, DatabaseBackup } from 'lucide-react';
+import { Search, Pencil, Trash2, Eye, Heart, Download, Plus, Newspaper, FolderKanban, Map, Eraser, DatabaseBackup, MessageSquare } from 'lucide-react';
 
 interface Post {
   id: number;
@@ -225,6 +225,13 @@ export default function AdminDashboard() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-1 shrink-0">
+                  <Link
+                    href={`/admin/comments?post_type=${post.type}&post_id=${post.id}&title=${encodeURIComponent(post.title)}`}
+                    className="p-2 text-gray-400 hover:text-purple-400 hover:bg-gray-800 rounded-lg transition-colors"
+                    title="留言管理"
+                  >
+                    <MessageSquare size={15} />
+                  </Link>
                   <Link
                     href={`/admin/edit/${post.type}/${post.id}`}
                     className="p-2 text-gray-400 hover:text-blue-400 hover:bg-gray-800 rounded-lg transition-colors"
