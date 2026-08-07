@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, Pencil, Trash2, Eye, Heart, Download, Plus, Newspaper, FolderKanban, Map } from 'lucide-react';
+import { Search, Pencil, Trash2, Eye, Heart, Download, Plus, Newspaper, FolderKanban, Map, Eraser, DatabaseBackup } from 'lucide-react';
 
 interface Post {
   id: number;
@@ -28,6 +28,9 @@ export default function AdminDashboard() {
   const [typeFilter, setTypeFilter] = useState<'all' | 'blog' | 'portfolio' | 'minecraft'>('all');
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [cleaning, setCleaning] = useState(false);
+  const [cleanResult, setCleanResult] = useState<{ deleted: number; freedBytes: number } | null>(null);
+  const [backing, setBacking] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -44,6 +47,39 @@ export default function AdminDashboard() {
     const matchSearch = p.title.toLowerCase().includes(search.toLowerCase());
     return matchType && matchSearch;
   });
+
+  const handleBackup = async () => {
+    setBacking(true);
+    try {
+      const res = await fetch('/api/admin/backup');
+      if (!res.ok) { alert('備份失敗'); return; }
+      const blob = await res.blob();
+      const date = new Date().toISOString().slice(0, 10);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `gdnb-backup-${date}.tar.gz`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } finally {
+      setBacking(false);
+    }
+  };
+
+  const handleCleanup = async () => {
+    // 先預覽
+    const preview = await fetch('/api/admin/cleanup').then(r => r.json()) as { orphans: number; totalBytes: number };
+    if (preview.orphans === 0) {
+      alert('沒有孤立圖片，不需要清理。');
+      return;
+    }
+    const mb = (preview.totalBytes / 1024 / 1024).toFixed(2);
+    if (!confirm(`找到 ${preview.orphans} 張孤立圖片（共 ${mb} MB），確定要刪除？`)) return;
+    setCleaning(true);
+    setCleanResult(null);
+    const res = await fetch('/api/admin/cleanup', { method: 'POST' }).then(r => r.json()) as { deleted: number; freedBytes: number };
+    setCleanResult(res);
+    setCleaning(false);
+  };
 
   const handleDelete = async (post: Post) => {
     if (!confirm(`確定要刪除「${post.title}」？此操作無法復原。`)) return;
@@ -64,12 +100,41 @@ export default function AdminDashboard() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-white">儀表板</h1>
-        <Link
-          href="/admin/new"
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          <Plus size={16} />新增貼文
-        </Link>
+        <div className="flex items-center gap-2">
+          {cleanResult && (
+            <span className="text-xs text-green-400">
+              已刪除 {cleanResult.deleted} 張，釋放 {(cleanResult.freedBytes / 1024 / 1024).toFixed(2)} MB
+            </span>
+          )}
+          <button
+            onClick={() => void handleBackup()}
+            disabled={backing}
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-700"
+            title="下載備份"
+          >
+            {backing
+              ? <><div className="w-4 h-4 border-2 border-gray-400 border-t-white rounded-full animate-spin" />備份中...</>
+              : <><DatabaseBackup size={15} />備份</>
+            }
+          </button>
+          <button
+            onClick={() => void handleCleanup()}
+            disabled={cleaning}
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-700"
+            title="清理孤立圖片"
+          >
+            {cleaning
+              ? <><div className="w-4 h-4 border-2 border-gray-400 border-t-white rounded-full animate-spin" />清理中...</>
+              : <><Eraser size={15} />清理圖片</>
+            }
+          </button>
+          <Link
+            href="/admin/new"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Plus size={16} />新增貼文
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}

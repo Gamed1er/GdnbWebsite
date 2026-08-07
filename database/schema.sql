@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS minecraft_maps (
   title TEXT NOT NULL,
   description TEXT NOT NULL,          -- Markdown
   cover_image TEXT,
-  file_path TEXT NOT NULL,
+  file_path TEXT,
   file_size INTEGER,
   datapack_path TEXT,
   datapack_size INTEGER,

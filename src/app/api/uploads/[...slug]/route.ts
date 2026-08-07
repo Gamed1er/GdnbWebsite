@@ -13,7 +13,13 @@ const MIME: Record<string, string> = {
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), 'public', 'images', 'uploads', ...slug);
+  const baseDir = path.join(process.cwd(), 'public', 'images', 'uploads');
+  const filePath = path.join(baseDir, ...slug);
+
+  // 防止路徑穿越攻擊
+  if (!filePath.startsWith(baseDir + path.sep) && filePath !== baseDir) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
 
   if (!fs.existsSync(filePath)) {
     return new NextResponse('Not found', { status: 404 });
