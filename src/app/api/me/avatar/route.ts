@@ -35,6 +35,9 @@ export async function POST(req: Request) {
     }
   } catch { /* 忽略 */ }
 
+  // 確保目錄存在
+  fs.mkdirSync(avatarsDir, { recursive: true });
+
   const buf = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(path.join(avatarsDir, filename), buf);
 

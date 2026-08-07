@@ -99,14 +99,13 @@ export default function ProfilePage() {
         newAvatarUrl = data.avatarUrl;
       }
 
-      // 更新暱稱
+      // 更新暱稱（avatarUrl 由 /api/me/avatar 端點直接處理，這裡不重送）
       const patchBody: Record<string, unknown> = {};
       const trimmed = nickname.trim();
-      // 若與目前顯示名稱不同才送
-      if (trimmed !== me?.name || trimmed === '') {
+      // 若暱稱有變動才送
+      if (trimmed !== me?.name) {
         patchBody.nickname = trimmed || null;
       }
-      if (newAvatarUrl) patchBody.avatarUrl = newAvatarUrl;
 
       if (Object.keys(patchBody).length > 0) {
         const res = await fetch('/api/me', {
