@@ -66,6 +66,28 @@ if (!existingAdmin) {
   console.log(`✅ 更新密碼（帳號：${ADMIN_USERNAME}，密碼：${ADMIN_PASSWORD}）`);
 }
 
+// ── 留言黑名單預設關鍵字 ─────────────────────────────────
+const defaultBlacklist = [
+  // 中國領導人
+  '習近平', '習大大',
+  // 台灣政治人物（攻擊性/爭議用詞）
+  '賴親德', '綠共',
+  // 政治運動
+  '青鳥', '青鳥行動', '小草', '白小草',
+  // 台海議題
+  '台獨', '九二共識', '一中',
+  // 政治標籤
+  '覺青', '覺醒青年', '韓粉', '深藍', '深綠',
+  // 罷免
+  '罷免',
+];
+for (const keyword of defaultBlacklist) {
+  try {
+    db.prepare('INSERT OR IGNORE INTO comment_blacklist (keyword) VALUES (?)').run(keyword);
+  } catch (_) {}
+}
+console.log('✅ 留言黑名單關鍵字已設定');
+
 // ── 建立 uploads 目錄 ────────────────────────────────────
 const uploadsDir = path.join(__dirname, '..', 'public', 'images', 'uploads');
 if (!fs.existsSync(uploadsDir)) {

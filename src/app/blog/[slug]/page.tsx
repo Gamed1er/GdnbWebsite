@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import CommentSection from '@/components/CommentSection';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import BlogInteractions from '@/components/BlogInteractions';
@@ -94,6 +95,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <BlogInteractions slug={post.slug} initialViews={post.views} initialLikes={post.likes} />
         </div>
       </div>
+
+      <CommentSection postType="blog" postId={post.id} />
 
       <style>{`
         .markdown-body { color: var(--text-primary); line-height: 1.8; }

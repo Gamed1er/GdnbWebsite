@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import SessionProvider from '@/components/SessionProvider';
+import UserWidget from '@/components/UserWidget';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function RootLayout({
           <LanguageProvider>
           <Navbar />
           <main>{children}</main>
+          <UserWidget />
           <footer
             style={{
               borderTop: '1px solid var(--border)',

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Download, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import CommentSection from '@/components/CommentSection';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 
@@ -193,6 +194,8 @@ export default async function MinecraftMapPage({ params }: { params: Promise<{ i
         .markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
         .markdown-body blockquote { border-left: 3px solid #22c55e; padding-left: 1rem; margin: 1rem 0; color: var(--text-muted); font-style: italic; }
       `}</style>
+
+      <CommentSection postType="minecraft" postId={map.id} />
     </div>
   );
 }

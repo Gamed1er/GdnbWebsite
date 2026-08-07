@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import CommentSection from '@/components/CommentSection';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import GithubIcon from '@/components/icons/GithubIcon';
@@ -112,6 +113,8 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
           <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{item.description}</ReactMarkdown>
         </div>
       </div>
+
+      <CommentSection postType="portfolio" postId={item.id} />
 
       <style>{`
         .markdown-body { color: var(--text-primary); line-height: 1.8; }

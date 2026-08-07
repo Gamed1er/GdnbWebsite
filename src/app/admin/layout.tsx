@@ -6,11 +6,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import {
   LayoutDashboard, PlusCircle, Settings, LogOut, Gamepad2, Newspaper, FolderKanban, Map,
+  MessageSquare, Users,
 } from 'lucide-react';
 
 const navItems = [
   { href: '/admin', label: '儀表板', icon: LayoutDashboard, exact: true },
   { href: '/admin/new', label: '新增貼文', icon: PlusCircle },
+  { href: '/admin/comments', label: '留言管理', icon: MessageSquare },
+  { href: '/admin/users', label: '用戶管理', icon: Users },
   { href: '/admin/settings', label: '設定', icon: Settings },
 ];
 

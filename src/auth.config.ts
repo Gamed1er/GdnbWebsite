@@ -6,20 +6,32 @@ export default {
   session: { strategy: 'jwt' },
   providers: [], // providers 在 auth.ts 中定義
   callbacks: {
-    jwt({ token, user }) {
-      if (user) token.role = (user as Record<string, unknown>).role;
+    jwt({ token, user, account }) {
+      if (user) {
+        token.role = (user as Record<string, unknown>).role ?? 'user';
+        token.publicUserId = (user as Record<string, unknown>).publicUserId;
+      }
+      // Google OAuth 登入：標記 role=user
+      if (account?.provider === 'google') {
+        token.role = 'user';
+      }
       return token;
     },
     session({ session, token }) {
-      if (session.user) (session.user as unknown as Record<string, unknown>).role = token.role;
+      if (session.user) {
+        const u = session.user as unknown as Record<string, unknown>;
+        u.role = token.role;
+        u.publicUserId = token.publicUserId;
+      }
       return session;
     },
     authorized({ auth, request }) {
-      const isLoggedIn = !!auth?.user;
       const isAdmin = request.nextUrl.pathname.startsWith('/admin');
       const isLogin = request.nextUrl.pathname === '/admin/login';
-      if (isAdmin && !isLogin && !isLoggedIn) return false;
-      return true;
+      if (!isAdmin || isLogin) return true;
+
+      const role = (auth?.user as unknown as Record<string, unknown>)?.role;
+      return role === 'admin';
     },
   },
 } satisfies NextAuthConfig;
