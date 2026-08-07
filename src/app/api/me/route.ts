@@ -83,7 +83,7 @@ export async function PATCH(req: Request) {
     // 若換新頭貼，刪除舊的自訂頭貼檔案
     if (body.avatarUrl !== null) {
       const current = db.prepare('SELECT avatar_url FROM public_users WHERE id = ?').get(publicUserId) as { avatar_url: string | null } | undefined;
-      if (current?.avatar_url?.startsWith('/images/uploads/avatars/')) {
+      if (current?.avatar_url?.startsWith('/api/uploads/avatars/')) {
         const oldPath = path.join(process.cwd(), 'public', current.avatar_url);
         try { fs.unlinkSync(oldPath); } catch { /* 忽略 */ }
       }

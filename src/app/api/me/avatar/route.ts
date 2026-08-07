@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   const buf = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(path.join(avatarsDir, filename), buf);
 
-  const avatarUrl = `/images/uploads/avatars/${filename}`;
+  const avatarUrl = `/api/uploads/avatars/${filename}`;
 
   const db = getDb();
   db.prepare('UPDATE public_users SET avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(avatarUrl, publicUserId);
