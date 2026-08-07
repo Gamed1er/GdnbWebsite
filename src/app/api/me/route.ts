@@ -10,6 +10,7 @@ export async function GET() {
 
   const u = session.user as unknown as Record<string, unknown>;
   const role = u.role as string;
+  const db = getDb();
 
   // 管理員也查 public_users（有 publicUserId 才能改頭貼暱稱）
   if (role === 'admin') {
@@ -34,8 +35,6 @@ export async function GET() {
 
   const publicUserId = u.publicUserId as number | undefined;
   if (!publicUserId) return NextResponse.json(null);
-
-  const db = getDb();
   const user = db
     .prepare('SELECT id, name, nickname, avatar_url, bio, created_at FROM public_users WHERE id = ?')
     .get(publicUserId) as {
