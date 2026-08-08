@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { signIn } from 'next-auth/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MessageSquare, Trash2, Flag, CornerDownRight, X, LogIn } from 'lucide-react';
@@ -350,14 +351,14 @@ export default function CommentSection({ postType, postId }: Props) {
           <p style={{ color: 'var(--text-secondary)', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
             登入後即可留言
           </p>
-          <a href="/api/auth/signin/google" style={{
+          <button onClick={() => signIn('google', { callbackUrl: window.location.href })} style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
             padding: '8px 20px', background: 'white', color: '#374151',
-            borderRadius: '8px', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none',
-            border: '1px solid #e5e7eb',
+            borderRadius: '8px', fontWeight: 600, fontSize: '0.875rem',
+            border: '1px solid #e5e7eb', cursor: 'pointer',
           }}>
             <LogIn size={16} /> 用 Google 帳號登入
-          </a>
+          </button>
         </div>
       ) : null}
 
