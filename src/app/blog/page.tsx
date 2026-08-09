@@ -11,6 +11,7 @@ interface BlogPost {
   slug: string;
   title: string;
   excerpt: string;
+  cover_image: string | null;
   tags: string[];
   views: number;
   likes: number;
@@ -87,21 +88,31 @@ export default function BlogPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filtered.map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
-              <div className="card" style={{ padding: '1.5rem' }}>
-                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}>
-                  {post.tags.map((tag) => <span key={tag} className="tag">{tag}</span>)}
-                </div>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem', lineHeight: 1.4 }}>
-                  {post.title}
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-                  {post.excerpt}
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  <span>{new Date(post.created_at).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US')}</span>
-                  <div style={{ display: 'flex', gap: '1rem' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Eye size={13} /> {post.views.toLocaleString()}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={13} /> {post.likes.toLocaleString()}</span>
+              <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                {post.cover_image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={post.cover_image}
+                    alt={post.title}
+                    style={{ width: '100%', aspectRatio: '16/7', objectFit: 'cover', display: 'block' }}
+                  />
+                )}
+                <div style={{ padding: '1.25rem 1.5rem 1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}>
+                    {post.tags.map((tag) => <span key={tag} className="tag">{tag}</span>)}
+                  </div>
+                  <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem', lineHeight: 1.4 }}>
+                    {post.title}
+                  </h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+                    {post.excerpt}
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    <span>{new Date(post.created_at).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US')}</span>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Eye size={13} /> {post.views.toLocaleString()}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={13} /> {post.likes.toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
               </div>

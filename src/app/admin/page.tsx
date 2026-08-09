@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [cleaning, setCleaning] = useState(false);
-  const [cleanResult, setCleanResult] = useState<{ deleted: number; freedBytes: number } | null>(null);
+  const [cleanResult, setCleanResult] = useState<{ deletedComments: number; deletedImages: number; deletedMapFiles: number; freedBytes: number } | null>(null);
   const [backing, setBacking] = useState(false);
 
   const fetchPosts = useCallback(async () => {
@@ -66,17 +66,27 @@ export default function AdminDashboard() {
   };
 
   const handleCleanup = async () => {
-    // 先預覽
-    const preview = await fetch('/api/admin/cleanup').then(r => r.json()) as { orphans: number; totalBytes: number };
-    if (preview.orphans === 0) {
-      alert('沒有孤立圖片，不需要清理。');
+    const preview = await fetch('/api/admin/cleanup').then(r => r.json()) as {
+      softDeletedComments: number; orphanImages: number; orphanMapFiles: number; totalBytes: number;
+    };
+    const nothingToDo = preview.softDeletedComments === 0 && preview.orphanImages === 0 && preview.orphanMapFiles === 0;
+    if (nothingToDo) {
+      alert('沒有需要清理的項目。');
       return;
     }
     const mb = (preview.totalBytes / 1024 / 1024).toFixed(2);
-    if (!confirm(`找到 ${preview.orphans} 張孤立圖片（共 ${mb} MB），確定要刪除？`)) return;
+    const lines = [
+      preview.softDeletedComments > 0 ? `• 已刪除留言：${preview.softDeletedComments} 則` : '',
+      preview.orphanImages > 0 ? `• 孤立圖片：${preview.orphanImages} 張` : '',
+      preview.orphanMapFiles > 0 ? `• 孤立地圖檔案：${preview.orphanMapFiles} 個` : '',
+      `• 釋放空間：${mb} MB`,
+    ].filter(Boolean).join('\n');
+    if (!confirm(`確定要清理以下項目？\n\n${lines}`)) return;
     setCleaning(true);
     setCleanResult(null);
-    const res = await fetch('/api/admin/cleanup', { method: 'POST' }).then(r => r.json()) as { deleted: number; freedBytes: number };
+    const res = await fetch('/api/admin/cleanup', { method: 'POST' }).then(r => r.json()) as {
+      deletedComments: number; deletedImages: number; deletedMapFiles: number; freedBytes: number;
+    };
     setCleanResult(res);
     setCleaning(false);
   };
@@ -103,7 +113,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2">
           {cleanResult && (
             <span className="text-xs text-green-400">
-              已刪除 {cleanResult.deleted} 張，釋放 {(cleanResult.freedBytes / 1024 / 1024).toFixed(2)} MB
+              已清理：留言 {cleanResult.deletedComments} 則 / 圖片 {cleanResult.deletedImages} 張 / 地圖 {cleanResult.deletedMapFiles} 個，釋放 {(cleanResult.freedBytes / 1024 / 1024).toFixed(2)} MB
             </span>
           )}
           <button
@@ -121,11 +131,11 @@ export default function AdminDashboard() {
             onClick={() => void handleCleanup()}
             disabled={cleaning}
             className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-700"
-            title="清理孤立圖片"
+            title="清理多餘檔案"
           >
             {cleaning
               ? <><div className="w-4 h-4 border-2 border-gray-400 border-t-white rounded-full animate-spin" />清理中...</>
-              : <><Eraser size={15} />清理圖片</>
+              : <><Eraser size={15} />清理檔案</>
             }
           </button>
           <Link
