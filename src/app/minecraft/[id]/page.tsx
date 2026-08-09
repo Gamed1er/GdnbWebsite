@@ -4,6 +4,7 @@ import { ArrowLeft, Download, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CommentSection from '@/components/CommentSection';
+import MinecraftStats from '@/components/MinecraftStats';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 
@@ -20,6 +21,7 @@ interface MinecraftMap {
   resourcepack_size: number | null;
   version: string | null;
   tags: string[];
+  views: number;
   downloads: number;
   created_at: string;
 }
@@ -98,10 +100,10 @@ export default async function MinecraftMapPage({ params }: { params: Promise<{ i
           {map.title}
         </h1>
 
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
           發布於 {new Date(map.created_at).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}
-          　·　<Download size={12} style={{ display: 'inline', verticalAlign: 'middle' }} /> {map.downloads.toLocaleString()} 次下載
         </p>
+        <MinecraftStats mapId={map.id} initialViews={map.views} downloads={map.downloads} />
       </div>
 
       {/* 下載按鈕區 */}
