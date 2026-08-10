@@ -9,7 +9,7 @@ import MinecraftStats from '@/components/MinecraftStats';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 
-const CommentSection = dynamic(() => import('@/components/CommentSection'), { ssr: false });
+const CommentSection = dynamic(() => import('@/components/CommentSection'));
 
 interface MinecraftMap {
   id: number;

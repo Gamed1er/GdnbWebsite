@@ -10,7 +10,7 @@ import type { Metadata } from 'next';
 import GithubIcon from '@/components/icons/GithubIcon';
 import BlogInteractions from '@/components/BlogInteractions';
 
-const CommentSection = dynamic(() => import('@/components/CommentSection'), { ssr: false });
+const CommentSection = dynamic(() => import('@/components/CommentSection'));
 
 interface ExtraLink { label: string; url: string }
 

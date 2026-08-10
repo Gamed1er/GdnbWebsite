@@ -8,7 +8,7 @@ import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import BlogInteractions from '@/components/BlogInteractions';
 
-const CommentSection = dynamic(() => import('@/components/CommentSection'), { ssr: false });
+const CommentSection = dynamic(() => import('@/components/CommentSection'));
 
 interface BlogPost {
   id: number;
