@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Package, BookOpen, Video, Gamepad2 } from 'lucide-react';
-import HeroImage from '@/components/HeroImage';
 import GithubIcon from '@/components/icons/GithubIcon';
 import { useLang } from '@/contexts/LanguageContext';
 
@@ -100,7 +99,6 @@ export default function HomePage() {
             background: 'linear-gradient(135deg, #0d1b2a 0%, #1a2d4a 50%, #0f1117 100%)',
           }}
         />
-        <HeroImage />
         <div
           style={{
             position: 'absolute',

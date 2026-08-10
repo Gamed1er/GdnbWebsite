@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search, Eye, Heart } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n';
@@ -90,12 +91,9 @@ export default function BlogPage() {
             <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
               <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 {post.cover_image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={post.cover_image}
-                    alt={post.title}
-                    style={{ width: '100%', aspectRatio: '16/7', objectFit: 'cover', display: 'block' }}
-                  />
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/7', overflow: 'hidden' }}>
+                    <Image src={post.cover_image} alt={post.title} fill sizes="(max-width: 768px) 100vw, 860px" style={{ objectFit: 'cover' }} />
+                  </div>
                 )}
                 <div style={{ padding: '1.25rem 1.5rem 1.5rem' }}>
                   <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}>

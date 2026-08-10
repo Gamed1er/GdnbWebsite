@@ -43,7 +43,7 @@ function getReferencedImageFilenames(db: ReturnType<typeof getDb>): Set<string> 
   return referencedFilenames;
 }
 
-// 收集 DB 中所有被引用的地圖檔案路徑
+// 收集 DB 中所有被引用的地圖檔案名稱（只取 basename，不管路徑前綴格式）
 function getReferencedMapFiles(db: ReturnType<typeof getDb>): Set<string> {
   const referenced = new Set<string>();
   const maps = db.prepare('SELECT file_path, datapack_path, resourcepack_path FROM minecraft_maps').all() as Array<{
@@ -52,9 +52,9 @@ function getReferencedMapFiles(db: ReturnType<typeof getDb>): Set<string> {
     resourcepack_path: string | null;
   }>;
   for (const m of maps) {
-    if (m.file_path) referenced.add(m.file_path);
-    if (m.datapack_path) referenced.add(m.datapack_path);
-    if (m.resourcepack_path) referenced.add(m.resourcepack_path);
+    if (m.file_path) referenced.add(path.basename(m.file_path));
+    if (m.datapack_path) referenced.add(path.basename(m.datapack_path));
+    if (m.resourcepack_path) referenced.add(path.basename(m.resourcepack_path));
   }
   return referenced;
 }
@@ -104,7 +104,7 @@ export async function GET() {
   if (fs.existsSync(mapsDir)) {
     const referencedMaps = getReferencedMapFiles(db);
     const allMapFiles = fs.readdirSync(mapsDir).filter(f => fs.statSync(path.join(mapsDir, f)).isFile());
-    const orphanFiles = allMapFiles.filter(f => !referencedMaps.has(`maps/${f}`));
+    const orphanFiles = allMapFiles.filter(f => !referencedMaps.has(f));
     orphanMapFiles = orphanFiles.length;
     totalBytes += orphanFiles.reduce((sum, f) => {
       try { return sum + fs.statSync(path.join(mapsDir, f)).size; } catch { return sum; }
@@ -150,7 +150,7 @@ export async function POST() {
   if (fs.existsSync(mapsDir)) {
     const referencedMaps = getReferencedMapFiles(db);
     const allMapFiles = fs.readdirSync(mapsDir).filter(f => fs.statSync(path.join(mapsDir, f)).isFile());
-    const orphans = allMapFiles.filter(f => !referencedMaps.has(`maps/${f}`));
+    const orphans = allMapFiles.filter(f => !referencedMaps.has(f));
 
     for (const filename of orphans) {
       const filePath = path.join(mapsDir, filename);

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Search, Eye, Heart, ExternalLink } from 'lucide-react';
 import GithubIcon from '@/components/icons/GithubIcon';
 import { useLang } from '@/contexts/LanguageContext';
@@ -97,8 +98,9 @@ export default function PortfolioPage() {
             >
               {/* 封面圖 */}
               {item.cover_image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.cover_image} alt={item.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '8px 8px 0 0' }} />
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
+                  <Image src={item.cover_image} alt={item.title} fill sizes="(max-width: 768px) 100vw, 400px" style={{ objectFit: 'cover' }} />
+                </div>
               )}
 
               <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', flex: 1 }}>

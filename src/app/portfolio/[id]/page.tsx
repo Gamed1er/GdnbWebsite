@@ -1,13 +1,16 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import CommentSection from '@/components/CommentSection';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import GithubIcon from '@/components/icons/GithubIcon';
 import BlogInteractions from '@/components/BlogInteractions';
+
+const CommentSection = dynamic(() => import('@/components/CommentSection'), { ssr: false });
 
 interface ExtraLink { label: string; url: string }
 
@@ -65,8 +68,9 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
 
       {/* 封面圖 */}
       {item.cover_image && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={item.cover_image} alt={item.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '10px', marginBottom: '2rem' }} />
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '10px', overflow: 'hidden', marginBottom: '2rem' }}>
+          <Image src={item.cover_image} alt={item.title} fill sizes="(max-width: 860px) 100vw, 860px" style={{ objectFit: 'cover' }} priority />
+        </div>
       )}
 
       <div style={{ marginBottom: '2rem' }}>

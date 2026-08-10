@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Search, Download, Package } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n';
@@ -102,8 +103,9 @@ export default function MinecraftPage() {
             >
                 {/* 封面圖 */}
                 {map.cover_image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={map.cover_image} alt={map.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '8px 8px 0 0' }} />
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
+                    <Image src={map.cover_image} alt={map.title} fill sizes="(max-width: 768px) 100vw, 400px" style={{ objectFit: 'cover' }} />
+                  </div>
                 ) : (
                   <div style={{ width: '100%', aspectRatio: '16/9', background: 'linear-gradient(135deg, #1a3a2a 0%, #0d1f17 100%)', borderRadius: '8px 8px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Package size={40} style={{ color: '#22c55e', opacity: 0.4 }} />

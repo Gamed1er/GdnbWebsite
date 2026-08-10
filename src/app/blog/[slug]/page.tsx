@@ -1,12 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import CommentSection from '@/components/CommentSection';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import BlogInteractions from '@/components/BlogInteractions';
+
+const CommentSection = dynamic(() => import('@/components/CommentSection'), { ssr: false });
 
 interface BlogPost {
   id: number;

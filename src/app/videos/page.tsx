@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Play, Eye, Globe } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n';
@@ -113,8 +114,7 @@ export default function VideosPage() {
               <div className="card" style={{ overflow: 'hidden' }}>
                 <div style={{ position: 'relative', aspectRatio: '16/9', background: '#0a0f1a' }}>
                   {video.thumbnail_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={video.thumbnail_url} alt={video.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Image src={video.thumbnail_url} alt={video.title} fill sizes="(max-width: 768px) 100vw, 350px" style={{ objectFit: 'cover' }} />
                   )}
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0)', transition: 'background 0.2s' }} className="video-overlay">
                     <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }} className="play-btn">

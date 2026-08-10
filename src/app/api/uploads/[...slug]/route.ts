@@ -25,14 +25,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     return new NextResponse('Not found', { status: 404 });
   }
 
-  const buffer = fs.readFileSync(filePath);
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME[ext] ?? 'application/octet-stream';
+  try {
+    const buffer = fs.readFileSync(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = MIME[ext] ?? 'application/octet-stream';
 
-  return new NextResponse(buffer, {
-    headers: {
-      'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    },
-  });
+    return new NextResponse(buffer, {
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
+  } catch {
+    return new NextResponse('Not found', { status: 404 });
+  }
 }

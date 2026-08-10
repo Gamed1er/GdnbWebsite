@@ -1,12 +1,15 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, Download, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import CommentSection from '@/components/CommentSection';
 import MinecraftStats from '@/components/MinecraftStats';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
+
+const CommentSection = dynamic(() => import('@/components/CommentSection'), { ssr: false });
 
 interface MinecraftMap {
   id: number;
@@ -74,8 +77,9 @@ export default async function MinecraftMapPage({ params }: { params: Promise<{ i
 
       {/* 封面圖 */}
       {map.cover_image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={map.cover_image} alt={map.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '10px', marginBottom: '2rem' }} />
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '10px', overflow: 'hidden', marginBottom: '2rem' }}>
+          <Image src={map.cover_image} alt={map.title} fill sizes="(max-width: 860px) 100vw, 860px" style={{ objectFit: 'cover' }} priority />
+        </div>
       ) : (
         <div style={{ width: '100%', aspectRatio: '16/9', background: 'linear-gradient(135deg, #1a3a2a 0%, #0d1f17 100%)', borderRadius: '10px', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Package size={60} style={{ color: '#22c55e', opacity: 0.3 }} />
