@@ -56,3 +56,5 @@ src/middleware.ts.bak
 
 *.sh
 *.deb
+
+CLAUDE.md

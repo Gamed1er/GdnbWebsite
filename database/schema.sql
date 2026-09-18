@@ -156,6 +156,13 @@ CREATE TABLE IF NOT EXISTS youtube_videos (
   synced_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 小工具使用記錄
+CREATE TABLE IF NOT EXISTS tool_usage_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tool_slug TEXT NOT NULL,
+  used_at TEXT NOT NULL DEFAULT (date('now'))
+);
+
 -- 網站設定
 CREATE TABLE IF NOT EXISTS site_settings (
   key TEXT PRIMARY KEY,
@@ -181,3 +188,4 @@ CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_type, post_id, cre
 CREATE INDEX IF NOT EXISTS idx_comments_user ON comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_parent ON comments(parent_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_tool_usage ON tool_usage_logs(tool_slug, used_at);

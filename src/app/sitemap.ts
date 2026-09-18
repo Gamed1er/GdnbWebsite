@@ -14,7 +14,7 @@ async function fetchJson<T>(path: string): Promise<T[]> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [blogs, portfolios, maps] = await Promise.all([
-    fetchJson<{ slug: string; updated_at: string }>('/api/blog'),
+    fetchJson<{ id: number; updated_at: string }>('/api/blog'),
     fetchJson<{ id: number; updated_at: string }>('/api/portfolio'),
     fetchJson<{ id: number; updated_at: string }>('/api/minecraft'),
   ]);
@@ -25,10 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/portfolio`, lastModified: new Date(), priority: 0.9,  changeFrequency: 'monthly' },
     { url: `${BASE}/minecraft`, lastModified: new Date(), priority: 0.9,  changeFrequency: 'monthly' },
     { url: `${BASE}/videos`,    lastModified: new Date(), priority: 0.7,  changeFrequency: 'weekly'  },
+    { url: `${BASE}/tools`,     lastModified: new Date(), priority: 0.6,  changeFrequency: 'monthly' },
+    { url: `${BASE}/tools/image-background-removal`, lastModified: new Date(), priority: 0.6, changeFrequency: 'monthly' },
   ];
 
   const blogPages: MetadataRoute.Sitemap = blogs.map((p) => ({
-    url: `${BASE}/blog/${p.slug}`,
+    url: `${BASE}/blog/${p.id}`,
     lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
     priority: 0.8,
     changeFrequency: 'monthly',

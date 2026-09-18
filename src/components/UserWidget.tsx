@@ -33,7 +33,7 @@ function postTypeLabel(t: string | null) {
 
 function postTypeUrl(postType: string | null, postId: number | null) {
   if (!postType || !postId) return null;
-  if (postType === 'blog') return `/blog`;
+  if (postType === 'blog') return `/blog/${postId}`;
   if (postType === 'portfolio') return `/portfolio/${postId}`;
   if (postType === 'minecraft') return `/minecraft/${postId}`;
   return null;

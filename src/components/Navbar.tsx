@@ -20,6 +20,7 @@ export default function Navbar() {
     { href: '/portfolio', label: nav.portfolio },
     { href: '/minecraft', label: nav.minecraft },
     { href: '/videos', label: nav.videos },
+    { href: '/tools', label: nav.tools },
   ];
 
   return (

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { ArrowLeft } from 'lucide-react';
@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import type { Metadata } from 'next';
 import BlogInteractions from '@/components/BlogInteractions';
+import getDb from '@/lib/db';
 
 const CommentSection = dynamic(() => import('@/components/CommentSection'));
 
@@ -23,16 +24,26 @@ interface BlogPost {
   created_at: string;
 }
 
-async function getPost(slug: string): Promise<BlogPost | null> {
+// 舊網址是 /blog/<slug>；數字以外的值一律當作舊 slug 查出對應 id
+function resolveId(idOrSlug: string): number | null {
+  if (/^\d+$/.test(idOrSlug)) return Number(idOrSlug);
+  const db = getDb();
+  const row = db.prepare('SELECT id FROM blog_posts WHERE slug = ?').get(idOrSlug) as { id: number } | undefined;
+  return row?.id ?? null;
+}
+
+async function getPost(id: number): Promise<BlogPost | null> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/blog/${slug}`, { cache: 'no-store' });
+  const res = await fetch(`${baseUrl}/api/blog/${id}`, { cache: 'no-store' });
   if (!res.ok) return null;
   return res.json();
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getPost(slug);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const resolvedId = resolveId(id);
+  if (!resolvedId) return { title: '找不到文章' };
+  const post = await getPost(resolvedId);
   if (!post) return { title: '找不到文章' };
   return {
     title: post.title,
@@ -51,9 +62,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const post = await getPost(slug);
+export default async function BlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const resolvedId = resolveId(id);
+  if (!resolvedId) notFound();
+  if (String(resolvedId) !== id) permanentRedirect(`/blog/${resolvedId}`);
+
+  const post = await getPost(resolvedId);
   if (!post) notFound();
 
   return (
@@ -79,7 +94,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             {new Date(post.created_at).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
-          <BlogInteractions slug={post.slug} initialViews={post.views} initialLikes={post.likes} />
+          <BlogInteractions slug={String(post.id)} initialViews={post.views} initialLikes={post.likes} />
         </div>
       </div>
 
@@ -94,7 +109,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>如果這篇文章對你有幫助，歡迎按喜歡 ❤️</p>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <BlogInteractions slug={post.slug} initialViews={post.views} initialLikes={post.likes} />
+          <BlogInteractions slug={String(post.id)} initialViews={post.views} initialLikes={post.likes} />
         </div>
       </div>
 

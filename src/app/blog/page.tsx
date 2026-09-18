@@ -88,7 +88,7 @@ export default function BlogPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filtered.map((post) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
+            <Link key={post.id} href={`/blog/${post.id}`} style={{ textDecoration: 'none' }}>
               <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 {post.cover_image && (
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/7', overflow: 'hidden' }}>

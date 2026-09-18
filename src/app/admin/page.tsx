@@ -31,6 +31,7 @@ export default function AdminDashboard() {
   const [cleaning, setCleaning] = useState(false);
   const [cleanResult, setCleanResult] = useState<{ deletedComments: number; deletedImages: number; deletedMapFiles: number; freedBytes: number } | null>(null);
   const [backing, setBacking] = useState(false);
+  const [toolUsage, setToolUsage] = useState(0);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -41,6 +42,12 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => { void fetchPosts(); }, [fetchPosts]);
+  useEffect(() => {
+    fetch('/api/admin/tools/usage')
+      .then((r) => r.json())
+      .then((data: { total: number }) => setToolUsage(data.total))
+      .catch(() => {});
+  }, []);
 
   const filtered = posts.filter(p => {
     const matchType = typeFilter === 'all' || p.type === typeFilter;
@@ -148,12 +155,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-5 gap-4 mb-8">
         {[
           { label: '總貼文', value: stats.total },
           { label: '已發佈', value: stats.published },
           { label: '總觀看', value: stats.views.toLocaleString() },
           { label: '地圖下載', value: stats.downloads.toLocaleString() },
+          { label: '小工具使用次數', value: toolUsage.toLocaleString() },
         ].map(s => (
           <div key={s.label} className="bg-gray-900 rounded-xl p-4 border border-gray-800">
             <p className="text-gray-400 text-xs mb-1">{s.label}</p>

@@ -9,7 +9,7 @@ export async function GET() {
 
   const db = getDb();
 
-  const blogs = db.prepare(`SELECT id, 'blog' as type, title, slug as ref, published, views, likes, 0 as downloads, tags, created_at FROM blog_posts ORDER BY created_at DESC`).all() as Record<string, unknown>[];
+  const blogs = db.prepare(`SELECT id, 'blog' as type, title, id as ref, published, views, likes, 0 as downloads, tags, created_at FROM blog_posts ORDER BY created_at DESC`).all() as Record<string, unknown>[];
 
   const portfolios = db.prepare(`SELECT id, 'portfolio' as type, title, id as ref, published, views, likes, 0 as downloads, tags, created_at FROM portfolio_items ORDER BY created_at DESC`).all() as Record<string, unknown>[];
 

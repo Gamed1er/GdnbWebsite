@@ -7,6 +7,7 @@ export const ui = {
       portfolio: '作品集',
       minecraft: 'MC 創作下載',
       videos: '影片',
+      tools: '小工具',
     },
     // 通用
     common: {
@@ -55,6 +56,37 @@ export const ui = {
       emptyHint: '請先設定 YouTube API Key，然後在管理員後台執行同步',
       langBadge: '中文為主 · EN available',
     },
+    // 小工具列表
+    tools: {
+      title: '小工具',
+      subtitle: '一些好用的線上小工具，處理過程都在你的瀏覽器內完成',
+      imageBackgroundRemoval: {
+        title: '圖像去背',
+        description: '上傳一張圖片，AI 自動幫你移除背景，輸出透明背景 PNG',
+      },
+      useTool: '使用工具',
+    },
+    // 圖像去背工具
+    imageBackgroundRemoval: {
+      title: '圖像去背',
+      subtitle: '上傳圖片，AI 自動移除背景。處理完全在你的瀏覽器內進行，圖片不會上傳到伺服器',
+      uploadPrompt: '點擊或拖曳圖片到這裡',
+      uploadHint: '支援 JPG / PNG / WebP',
+      fileTooLarge: '這張圖片超過 10MB，處理時間可能會比較長，請耐心等候',
+      invalidFormat: '不支援的圖片格式，請上傳 JPG / PNG 或 WebP',
+      loadingModel: '正在載入 AI 模型（第一次使用需要下載，之後會加快）...',
+      processing: '正在去背中...',
+      before: '原圖',
+      after: '去背後',
+      download: '下載 PNG',
+      reset: '重新上傳',
+      error: '處理失敗了，請換一張圖片再試一次',
+      browserUnsupported: '你的瀏覽器可能不支援此功能，建議改用最新版 Chrome、Edge 或 Safari',
+      qualityLabel: '品質',
+      qualityFast: '快速',
+      qualityStandard: '標準',
+      qualityHigh: '高品質',
+    },
   },
   en: {
     nav: {
@@ -63,6 +95,7 @@ export const ui = {
       portfolio: 'Portfolio',
       minecraft: 'MC Downloads',
       videos: 'Videos',
+      tools: 'Tools',
     },
     common: {
       loading: 'Loading...',
@@ -105,6 +138,35 @@ export const ui = {
       empty: 'No videos synced yet',
       emptyHint: 'Set up your YouTube API Key and run a sync from the admin panel.',
       langBadge: '中文 (Chinese) · EN available',
+    },
+    tools: {
+      title: 'Tools',
+      subtitle: 'Handy online tools — everything runs right in your browser',
+      imageBackgroundRemoval: {
+        title: 'Background Removal',
+        description: 'Upload an image and let AI remove the background, exporting a transparent PNG',
+      },
+      useTool: 'Use Tool',
+    },
+    imageBackgroundRemoval: {
+      title: 'Background Removal',
+      subtitle: 'Upload an image and AI removes the background automatically. Everything runs in your browser — nothing is uploaded to any server',
+      uploadPrompt: 'Click or drag an image here',
+      uploadHint: 'Supports JPG / PNG / WebP',
+      fileTooLarge: 'This image is over 10MB, processing may take a while — please be patient',
+      invalidFormat: 'Unsupported image format — please upload JPG, PNG, or WebP',
+      loadingModel: 'Loading AI model (first use downloads it, later uses will be faster)...',
+      processing: 'Removing background...',
+      before: 'Before',
+      after: 'After',
+      download: 'Download PNG',
+      reset: 'Upload another',
+      error: 'Something went wrong — please try a different image',
+      browserUnsupported: 'Your browser may not support this feature — try the latest Chrome, Edge, or Safari',
+      qualityLabel: 'Quality',
+      qualityFast: 'Fast',
+      qualityStandard: 'Standard',
+      qualityHigh: 'High Quality',
     },
   },
 } as const;

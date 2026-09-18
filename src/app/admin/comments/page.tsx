@@ -23,7 +23,7 @@ const POST_TYPE_LABEL: Record<string, string> = {
 };
 
 const POST_TYPE_URL: Record<string, (id: number) => string> = {
-  blog: () => '/blog',
+  blog: id => `/blog/${id}`,
   portfolio: id => `/portfolio/${id}`,
   minecraft: id => `/minecraft/${id}`,
 };
