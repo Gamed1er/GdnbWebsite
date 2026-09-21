@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import getDb from '@/lib/db';
 
-const KNOWN_TOOL_SLUGS = ['image-background-removal'];
+const KNOWN_TOOL_SLUGS = ['image-background-removal', 'video-subtitle-extraction'];
 
 export async function POST(req: Request) {
   let slug: unknown;

@@ -9,6 +9,12 @@ interface Settings {
   site_description: string;
 }
 
+interface SyncStatus {
+  at?: string;
+  status?: 'success' | 'error';
+  error?: string;
+}
+
 const DEFAULT: Settings = {
   youtube_channel_id: '',
   site_title: '遊戲亡',
@@ -17,19 +23,31 @@ const DEFAULT: Settings = {
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/admin/settings')
+  const loadSettings = () => {
+    return fetch('/api/admin/settings')
       .then(r => r.json())
-      .then((d: Partial<Settings>) => {
-        setSettings({ ...DEFAULT, ...d });
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      .then((d: Record<string, string>) => {
+        setSettings({
+          youtube_channel_id: d.youtube_channel_id ?? DEFAULT.youtube_channel_id,
+          site_title: d.site_title ?? DEFAULT.site_title,
+          site_description: d.site_description ?? DEFAULT.site_description,
+        });
+        setSyncStatus({
+          at: d.youtube_last_sync_at,
+          status: d.youtube_last_sync_status as 'success' | 'error' | undefined,
+          error: d.youtube_last_sync_error,
+        });
+      });
+  };
+
+  useEffect(() => {
+    loadSettings().finally(() => setLoading(false));
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -49,6 +67,7 @@ export default function SettingsPage() {
     setSyncing(true);
     const res = await fetch('/api/youtube/sync', { method: 'POST' });
     const data = await res.json() as { synced?: number; error?: string };
+    await loadSettings();
     setSyncing(false);
     if (data.synced !== undefined) {
       alert(`同步完成！已同步 ${data.synced} 部影片`);
@@ -121,6 +140,13 @@ export default function SettingsPage() {
             <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
             {syncing ? '同步中...' : '立即同步影片'}
           </button>
+          <p className="text-xs text-gray-600">每天 19:00 會自動同步一次</p>
+          {syncStatus.at && (
+            <p className={`text-xs ${syncStatus.status === 'error' ? 'text-red-400' : 'text-gray-500'}`}>
+              上次同步：{new Date(syncStatus.at).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}
+              {syncStatus.status === 'error' ? `　❌ 失敗：${syncStatus.error}` : '　✅ 成功'}
+            </p>
+          )}
         </section>
 
         <button
