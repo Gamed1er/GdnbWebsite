@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import getDb from '@/lib/db';
+import { notifyNewPost } from '@/lib/discord';
 
 function slugify(text: string): string {
   return text
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
     finalSlug = `${slug}-${counter++}`;
   }
 
+  const excerpt = (body as Record<string, unknown>).description as string || body.excerpt || null;
   const result = db.prepare(`
     INSERT INTO blog_posts (slug, title, content, excerpt, cover_image, tags, published)
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -37,11 +39,19 @@ export async function POST(req: Request) {
     finalSlug,
     body.title,
     body.content,
-    (body as Record<string, unknown>).description as string || body.excerpt || null,
+    excerpt,
     body.cover_image || null,
     JSON.stringify(body.tags ?? []),
     body.published ? 1 : 0
   );
+
+  if (body.published) {
+    const notified = await notifyNewPost({
+      type: 'blog', id: Number(result.lastInsertRowid), title: body.title,
+      description: excerpt, coverImage: body.cover_image || null,
+    });
+    if (notified) db.prepare('UPDATE blog_posts SET discord_notified = 1 WHERE id = ?').run(result.lastInsertRowid);
+  }
 
   return NextResponse.json({ id: result.lastInsertRowid, slug: finalSlug });
 }

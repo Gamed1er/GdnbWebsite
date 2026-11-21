@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import getDb from '@/lib/db';
+import { notifyNewPost } from '@/lib/discord';
 
 type Params = Promise<{ id: string }>;
 
@@ -39,6 +40,18 @@ export async function PUT(req: Request, { params }: { params: Params }) {
     body.sort_order ?? 0,
     Number(id)
   );
+
+  if (body.published) {
+    const current = db.prepare('SELECT discord_notified FROM portfolio_items WHERE id = ?').get(Number(id)) as { discord_notified: number } | undefined;
+    if (current && !current.discord_notified) {
+      const notified = await notifyNewPost({
+        type: 'portfolio', id: Number(id), title: body.title as string,
+        description: body.description as string, coverImage: (body.cover_image as string) || null,
+      });
+      if (notified) db.prepare('UPDATE portfolio_items SET discord_notified = 1 WHERE id = ?').run(Number(id));
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
 

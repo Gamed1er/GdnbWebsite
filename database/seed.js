@@ -40,6 +40,9 @@ const migrations = [
   "ALTER TABLE youtube_videos ADD COLUMN video_type TEXT NOT NULL DEFAULT 'video'",
   'ALTER TABLE minecraft_maps ADD COLUMN datapack_path TEXT',
   'ALTER TABLE minecraft_maps ADD COLUMN datapack_size INTEGER',
+  'ALTER TABLE blog_posts ADD COLUMN discord_notified INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE portfolio_items ADD COLUMN discord_notified INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE minecraft_maps ADD COLUMN discord_notified INTEGER NOT NULL DEFAULT 0',
 ];
 for (const sql of migrations) {
   try { db.prepare(sql).run(); } catch (_) { /* 欄位已存在，忽略 */ }

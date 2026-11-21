@@ -4,6 +4,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Download, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { markdownComponents } from '@/components/markdownComponents';
 import remarkGfm from 'remark-gfm';
 import MinecraftStats from '@/components/MinecraftStats';
 import rehypeRaw from 'rehype-raw';
@@ -180,7 +181,7 @@ export default async function MinecraftMapPage({ params }: { params: Promise<{ i
       {/* Markdown 說明 */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '2rem' }}>
         <div className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{map.description}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>{map.description}</ReactMarkdown>
         </div>
       </div>
 
